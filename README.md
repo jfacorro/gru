@@ -16,7 +16,7 @@ So we set out to try to build a system with these two main goals in mind.
 
 # Roadmap
 
-1. Define a simple, flexible API to define clients.
+1. Create a simple, flexible API to define clients.
 2. Basic spawning mechanism for clients.
 3. Metrics endpoints.
 4. Web UI.
