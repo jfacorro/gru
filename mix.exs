@@ -12,7 +12,9 @@ defmodule Grog.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger]]
+    [mod: {Grog, []},
+     registered: [Grog.Client.Supervisor],
+     applications: [:logger, :sync]]
   end
 
   # Dependencies can be Hex packages:
@@ -25,6 +27,8 @@ defmodule Grog.Mixfile do
   #
   # Type `mix help deps` for more examples and options
   defp deps do
-    []
+    [{:sync, github: "jfacorro/sync", tag: "master", only: :dev},
+     {:katana, github: "inaka/erlang-katana", tag: "jfacorro.53.random_int"}
+    ]
   end
 end
