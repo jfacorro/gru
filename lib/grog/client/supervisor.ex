@@ -1,16 +1,20 @@
 defmodule Grog.Client.Supervisor do
   use Supervisor
 
+  ## Supervisor
+
   def start_link do
     Supervisor.start_link(__MODULE__, [], [name: __MODULE__])
   end
 
   def init([]) do
-    children = [worker(Grog.Client.Server, [])]
+    children = [worker(Grog.Client.Server, [], shutdown: :brutal_kill)]
     supervise(children, strategy: :simple_one_for_one)
   end
 
-  def clients_count do
+  ## API
+
+  def count do
     Supervisor.count_children(__MODULE__)
   end
 

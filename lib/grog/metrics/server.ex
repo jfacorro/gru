@@ -8,19 +8,27 @@ defmodule Grog.Metrics.Server do
   ## API
 
   def report(metric, value) do
-    GenServer.cast(__MODULE__, {:report, metric, value})
+    name = Metric.name(metric)
+    metrics = lookup(@datastore, name) || %{}
+
+    metric_type = metric.__struct__
+    metric = Map.get(metrics, metric_type, metric)
+    metric = Metric.accumulate(metric, value)
+
+    metrics = Map.put(metrics, metric_type, metric)
+    insert(@datastore, name, metrics)
   end
 
   def get(name) do
-    GenServer.call(__MODULE__, {:get, name})
+    lookup(@datastore, name)
   end
 
   def get_all do
-    GenServer.call(__MODULE__, :get_all)
+    get_all(@datastore)
   end
 
   def clear do
-    GenServer.cast(__MODULE__, :clear)
+    delete_all(@datastore)
   end
 
   ## GenServer
@@ -35,31 +43,6 @@ defmodule Grog.Metrics.Server do
     {:ok, {}}
   end
 
-  def handle_call({:get, name}, _from, state) do
-    {:reply, lookup(@datastore, name), state}
-  end
-  def handle_call(:get_all, _from, state) do
-    {:reply, get_all(@datastore), state}
-  end
-
-  def handle_cast({:report, metric, value}, state) do
-    name = Metric.name(metric)
-    metrics = lookup(@datastore, name) || %{}
-
-    metric_type = metric.__struct__
-    metric = Map.get(metrics, metric_type, metric)
-    metric = Metric.accumulate(metric, value)
-
-    metrics = Map.put(metrics, metric_type, metric)
-    insert(@datastore, name, metrics)
-
-    {:noreply, state}
-  end
-  def handle_cast(:clear, state) do
-    delete_all(@datastore)
-    {:noreply, state}
-  end
-
   def terminate(_reason, _state) do
     Logger.info("Terminating '#{inspect __MODULE__}'")
   end
@@ -67,7 +50,13 @@ defmodule Grog.Metrics.Server do
   ## Internal
 
   defp create_table(name) do
-    :ets.new(name, [:set, :named_table, read_concurrency: true, keypos: 1])
+    opts = [:set,
+            :named_table,
+            :public,
+            read_concurrency: true,
+            write_concurrency: true,
+            keypos: 1]
+    :ets.new(name, opts)
   end
 
   defp insert(ds, key, item) do
