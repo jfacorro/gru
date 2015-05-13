@@ -19,6 +19,10 @@ defmodule Grog.Metrics.Server do
     GenServer.call(__MODULE__, :get_all)
   end
 
+  def clear do
+    GenServer.cast(__MODULE__, :clear)
+  end
+
   ## GenServer
 
   def start_link do
@@ -27,7 +31,7 @@ defmodule Grog.Metrics.Server do
 
   def init([]) do
     Logger.info("Starting #{inspect __MODULE__}")
-    create(@datastore)
+    create_table(@datastore)
     {:ok, {}}
   end
 
@@ -40,27 +44,37 @@ defmodule Grog.Metrics.Server do
 
   def handle_cast({:report, metric, value}, state) do
     name = Metric.name(metric)
-    metric = lookup(@datastore, name) || metric
+    metrics = lookup(@datastore, name) || %{}
+
+    metric_type = metric.__struct__
+    metric = Map.get(metrics, metric_type, metric)
     metric = Metric.accumulate(metric, value)
-    insert(@datastore, name, metric)
+
+    metrics = Map.put(metrics, metric_type, metric)
+    insert(@datastore, name, metrics)
+
+    {:noreply, state}
+  end
+  def handle_cast(:clear, state) do
+    delete_all(@datastore)
     {:noreply, state}
   end
 
   def terminate(_reason, _state) do
-    Logger.info("Terminating '#{inspect __MODULE__}' client...")
+    Logger.info("Terminating '#{inspect __MODULE__}'")
   end
 
   ## Internal
 
-  def create(name) do
+  defp create_table(name) do
     :ets.new(name, [:set, :named_table, read_concurrency: true, keypos: 1])
   end
 
-  def insert(ds, key, item) do
+  defp insert(ds, key, item) do
     :ets.insert(ds, {key, item})
   end
 
-  def lookup(ds, key) do
+  defp lookup(ds, key) do
     case exists?(ds, key) do
       true ->
         :ets.lookup_element(ds, key, 2)
@@ -69,12 +83,17 @@ defmodule Grog.Metrics.Server do
     end
   end
 
-  def exists?(ds, key) do
-    :ets.member(ds, key)
-  end
-
-  def get_all(ds) do
+  defp get_all(ds) do
     :ets.tab2list(ds)
     |> Enum.map(fn {_, metric} -> metric end)
   end
+
+  defp delete_all(ds) do
+    :ets.delete_all_objects(ds)
+  end
+
+  defp exists?(ds, key) do
+    :ets.member(ds, key)
+  end
+
 end
