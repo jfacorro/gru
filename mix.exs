@@ -14,7 +14,7 @@ defmodule Grog.Mixfile do
   def application do
     [mod: {Grog, []},
      registered: [Grog.Client.Supervisor],
-     applications: [:logger, :sync]]
+     applications: [:logger, :exreloader, :httpoison]]
   end
 
   # Dependencies can be Hex packages:
@@ -27,7 +27,9 @@ defmodule Grog.Mixfile do
   #
   # Type `mix help deps` for more examples and options
   defp deps do
-    [{:sync, github: "jfacorro/sync", tag: "master", only: :dev},
+    #[{:sync, github: "jfacorro/sync", tag: "master", only: :dev},
+    [{:exreloader, github: "jfacorro/exreloader", tag: "master", only: :dev},
+     {:httpoison, "~> 0.6.2"},
      {:katana, github: "inaka/erlang-katana", tag: "jfacorro.53.random_int"}
     ]
   end
