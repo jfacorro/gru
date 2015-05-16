@@ -26,4 +26,16 @@ defmodule Grog.Utils do
     {:ok, erl_src} = :ktn_code.beam_to_string(file)
     IO.puts erl_src
   end
+
+  @doc """
+  Runs the expresion provided and returns a tuple of the form
+  `{time, value}` where `time` is the time it took the expression
+  to complete in microseconds and `value` is the the value of the
+  expression provided.
+  """
+  defmacro time(expr) do
+    quote do
+      :timer.tc(fn -> unquote(expr) end)
+    end
+  end
 end
