@@ -1,6 +1,7 @@
 defmodule Grog.Client.Server do
   use GenServer
   require Logger
+  alias Grog.Utils
 
   def start_link module do
     GenServer.start_link(__MODULE__, [module])
@@ -17,7 +18,7 @@ defmodule Grog.Client.Server do
 
   def handle_info :timeout, state do
     tasks = state.module.__tasks__()
-    n = :ktn_random.integer(length(tasks))
+    n = Utils.uniform(length(tasks))
     task_name = Enum.at(tasks, n)
     apply(state.module, task_name, [state.client])
 
@@ -31,6 +32,6 @@ defmodule Grog.Client.Server do
   ## Internal functions
 
   defp wait_timeout state do
-    :ktn_random.integer(state.client.min_wait, state.client.max_wait)
+    Utils.uniform(state.client.min_wait, state.client.max_wait)
   end
 end

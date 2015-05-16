@@ -29,8 +29,8 @@ defmodule Grog.Mixfile do
   defp deps do
     #[{:sync, github: "jfacorro/sync", tag: "master", only: :dev},
     [{:exreloader, github: "jfacorro/exreloader", tag: "master", only: :dev},
-     {:httpoison, "~> 0.6.2"},
-     {:katana, github: "inaka/erlang-katana", tag: "jfacorro.53.random_int"}
+     {:eep, github: "virtan/eep", tag: "v1.1", only: :dev},
+     {:httpoison, "~> 0.6.2"}
     ]
   end
 end

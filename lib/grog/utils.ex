@@ -38,4 +38,41 @@ defmodule Grog.Utils do
       :timer.tc(fn -> unquote(expr) end)
     end
   end
+
+  @doc """
+  Profile the currently running code and generate a kcachegrind file.
+  """
+  def profile(filename \\ "profile")do
+    filename_str = String.to_char_list(filename)
+    :eep.start_file_tracing(filename_str)
+    :timer.sleep(3000)
+    :eep.stop_tracing()
+    :eep.convert_tracing(filename_str)
+  end
+
+  @doc """
+  Returns a uniform random number between `from` and `to`.
+  """
+  def uniform(from, to) when from < to do
+    ensure_seed()
+    from + :random.uniform(to - from) - 1
+  end
+
+  @doc """
+  Returns a uniform random number between `0` and `to`.
+  """
+  def uniform(to) do
+    uniform(0, to)
+  end
+
+  ## Internal
+
+  defp ensure_seed() do
+    case :erlang.get(:random_seed) do
+      :undefined ->
+        :random.seed(:os.timestamp())
+      _ ->
+        :ok
+    end
+  end
 end

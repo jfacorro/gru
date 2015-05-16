@@ -5,7 +5,6 @@ defmodule Grog do
   def start(_type, _args) do
     import Supervisor.Spec
     children = [supervisor(Grog.Client.Supervisor, []),
-                worker(:ktn_random, []),
                 worker(Grog.Metrics.Server, [])]
     opts = [strategy: :one_for_one,
             name: Grog.Supervisor]

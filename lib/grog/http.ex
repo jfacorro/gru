@@ -5,23 +5,29 @@ defmodule Grog.HTTP do
   alias Grog.Utils
   alias Grog.Metrics.Server, as: Metrics
   alias Grog.Metrics.Count
+  alias Grog.Metrics.CountInterval
   alias Grog.Metrics.Average
   alias Grog.Metrics.Min
   alias Grog.Metrics.Max
 
   def request(method, url, body \\ "", headers \\ [], opts \\ []) do
     {time, value} = Utils.time(HTTPoison.request(method, url, body, headers, opts))
+    # {time, value} = {1000, 1}
     report_metrics(opts[:name] || url, time / 1000)
     value
   end
 
   def request!(method, url, body \\ "", headers \\ [], opts \\ []) do
     {time, value} = Utils.time(HTTPoison.request!(method, url, body, headers, opts))
+    # {time, value} = {1000, 1}
     report_metrics(opts[:name] || url, time / 1000)
     value
   end
 
   defp report_metrics(name, time_ms) do
+    Metrics.report(%Count{name: "# Requests"}, 1)
+    Metrics.report(%CountInterval{name: "# Requests/sec", interval: 1000}, 1)
+
     Metrics.report(%Count{name: name}, 1)
     Metrics.report(%Average{name: name}, time_ms)
     Metrics.report(%Min{name: name}, time_ms)
