@@ -11,8 +11,8 @@ defmodule Grog.HTTP do
   alias Grog.Metrics.Max
 
   def request(method, url, body \\ "", headers \\ [], opts \\ []) do
-    {time, value} = Utils.time(HTTPoison.request(method, url, body, headers, opts))
-    # {time, value} = {1000, 1}
+    # {time, value} = Utils.time(HTTPoison.request(method, url, body, headers, opts))
+    {time, value} = {1000, 1}
     report_metrics(opts[:name] || url, time / 1000)
     value
   end

@@ -12,7 +12,7 @@ defmodule Grog.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [mod: {Grog, []},
+    [mod: {Grog.App, []},
      registered: [Grog.Client.Supervisor],
      applications: [:logger, :exreloader, :httpoison]]
   end

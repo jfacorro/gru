@@ -42,10 +42,10 @@ defmodule Grog.Utils do
   @doc """
   Profile the currently running code and generate a kcachegrind file.
   """
-  def profile(filename \\ "profile")do
+  def profile(filename \\ "profile", time \\ 1000)do
     filename_str = String.to_char_list(filename)
     :eep.start_file_tracing(filename_str)
-    :timer.sleep(3000)
+    :timer.sleep(time)
     :eep.stop_tracing()
     :eep.convert_tracing(filename_str)
   end
