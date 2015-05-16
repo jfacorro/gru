@@ -32,7 +32,7 @@ defmodule Grog.Mixfile do
     #[{:sync, github: "jfacorro/sync", tag: "master", only: :dev},
     [{:exreloader, github: "jfacorro/exreloader", tag: "master", only: :dev},
      {:eep, github: "virtan/eep", tag: "v1.1", only: :dev},
-     {:shotgun, github: "inaka/shotgun", tag: "0.1.8"}
+     {:shotgun, github: "inaka/shotgun", tag: "jfacorro.74.replace_local_maps_get_for_erlangs"}
     ]
   end
 end
