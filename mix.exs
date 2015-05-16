@@ -14,7 +14,9 @@ defmodule Grog.Mixfile do
   def application do
     [mod: {Grog.App, []},
      registered: [Grog.Client.Supervisor],
-     applications: [:logger, :exreloader, :httpoison]]
+     applications: [:logger,
+                    :exreloader,
+                    :shotgun]]
   end
 
   # Dependencies can be Hex packages:
@@ -30,7 +32,7 @@ defmodule Grog.Mixfile do
     #[{:sync, github: "jfacorro/sync", tag: "master", only: :dev},
     [{:exreloader, github: "jfacorro/exreloader", tag: "master", only: :dev},
      {:eep, github: "virtan/eep", tag: "v1.1", only: :dev},
-     {:httpoison, "~> 0.6.2"}
+     {:shotgun, github: "inaka/shotgun", tag: "0.1.8"}
     ]
   end
 end

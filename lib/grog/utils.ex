@@ -42,12 +42,14 @@ defmodule Grog.Utils do
   @doc """
   Profile the currently running code and generate a kcachegrind file.
   """
-  def profile(filename \\ "profile", time \\ 1000)do
-    filename_str = String.to_char_list(filename)
-    :eep.start_file_tracing(filename_str)
+  def profile(time \\ 1000)do
+    {{y, m, d}, {hh, mm, ss}} = :calendar.universal_time()
+    ymd_hhmmss = "#{inspect y}#{inspect m}#{inspect d}#{inspect hh}#{inspect mm}#{inspect ss}"
+    filename = 'filename-' ++ String.to_char_list(ymd_hhmmss)
+    :eep.start_file_tracing(filename)
     :timer.sleep(time)
     :eep.stop_tracing()
-    :eep.convert_tracing(filename_str)
+    :eep.convert_tracing(filename)
   end
 
   @doc """

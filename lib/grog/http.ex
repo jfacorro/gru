@@ -1,5 +1,4 @@
 defmodule Grog.HTTP do
-  use HTTPoison.Base
   require Logger
   require Grog.Utils
   alias Grog.Utils
@@ -10,17 +9,19 @@ defmodule Grog.HTTP do
   alias Grog.Metrics.Min
   alias Grog.Metrics.Max
 
-  def request(method, url, body \\ "", headers \\ [], opts \\ []) do
-    # {time, value} = Utils.time(HTTPoison.request(method, url, body, headers, opts))
-    {time, value} = {1000, 1}
-    report_metrics(opts[:name] || url, time / 1000)
-    value
+  def open(host, port) do
+    {:ok, conn} = :shotgun.open(String.to_char_list(host), port)
+    conn
   end
 
-  def request!(method, url, body \\ "", headers \\ [], opts \\ []) do
-    {time, value} = Utils.time(HTTPoison.request!(method, url, body, headers, opts))
-    # {time, value} = {1000, 1}
-    report_metrics(opts[:name] || url, time / 1000)
+  def close(conn) do
+    :shotgun.close(conn)
+  end
+
+  def get(conn, path, headers \\ %{}, opts \\ %{}) do
+    path_str = String.to_char_list(path)
+    {time, value} = Utils.time(:shotgun.get(conn, path_str, headers, opts))
+    report_metrics(opts[:name] || path, time / 1000)
     value
   end
 
