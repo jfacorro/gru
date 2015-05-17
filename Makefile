@@ -1,15 +1,19 @@
 PROJECT=grog
 
-all: deps compile
+all: get-deps compile
 
-deps:
+get-deps:
+	rm -f mix.lock
 	mix deps.get
 
 compile:
-	mix compile; mix compile.protocols
+	mix deps.compile
+	mix compile
+	mix compile.protocols
 
 clean-deps:
 	mix deps.clean --all
+	rm -rf deps
 
 clean: clean-deps
 	mix clean
