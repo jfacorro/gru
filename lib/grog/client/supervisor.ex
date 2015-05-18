@@ -8,7 +8,7 @@ defmodule Grog.Client.Supervisor do
   end
 
   def init([]) do
-    children = [worker(Grog.Client.Server, [], shutdown: :brutal_kill)]
+    children = [worker(Grog.Client.Server, [], shutdown: 10000)]
     supervise(children, strategy: :simple_one_for_one)
   end
 

@@ -4,3 +4,6 @@ erl_crash.dump
 *.ez
 mix.lock
 *.beam
+*.trace
+callgrind.out.*
+log/
