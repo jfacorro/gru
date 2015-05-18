@@ -55,8 +55,8 @@ defmodule Grog.HTTP do
         report_success(opts[:name] || path, time / 1000)
       {:ok, %{status_code: status_code}} ->
         report_error(opts[:name] || path, status_code)
-      {:error, Reason} ->
-        report_error(:error, Reason)
+      {:error, reason} ->
+        report_error(:error, reason)
     end
     value
   end

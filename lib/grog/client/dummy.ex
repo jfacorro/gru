@@ -1,5 +1,5 @@
  defmodule Grog.Client.Dummy do
-  use Grog.Client, name: "Dummy", min_wait: 1000, max_wait: 2000,
+  use Grog.Client, name: "Dummy", min_wait: 5000, max_wait: 10000,
                    conn: Grog.HTTP.open("localhost", 8383)
   require Logger
 
