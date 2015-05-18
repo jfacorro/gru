@@ -9,6 +9,8 @@ defmodule Grog.HTTP do
   alias Grog.Metrics.Min
   alias Grog.Metrics.Max
 
+  @timeout :infinity
+
   def open(host, port) do
     {:ok, conn} = :shotgun.open(String.to_char_list(host), port)
     conn
@@ -44,7 +46,7 @@ defmodule Grog.HTTP do
 
   def request(conn, method, path, body, headers \\ %{}, opts \\ %{}) do
     path_str = String.to_char_list(path)
-    opts = Map.put(opts, :timeout, :infinity)
+    opts = Map.put(opts, :timeout, @timeout)
     {time, value} = Utils.time(:shotgun.request(conn, method, path_str, headers, body, opts))
 
     report_general()
