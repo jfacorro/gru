@@ -1,7 +1,9 @@
 Grog
 ====
 
-Grog is an attempt to build a lightweight but scalable load and stress testing tool in Elixir. There are many benefits of using Elixir for this purposes, the main one being it runs on the Erlang VM, which washas built-in support for lightweight processes.
+<img src="http://i.imgur.com/bHp4rBm.jpg" align="right" style="float:right; margin: 30px; box-shadow: 0px 0px 5px #fff;" width="400" />
+
+Grog is an attempt to build a lightweight but scalable load and stress testing tool in Elixir. There are many benefits of using Elixir for this purposes, the main one being it runs on the Erlang VM, which has built-in support for lightweight processes.
 
 The name of the project is a reference to Monkey Island's beverage, we thought it was a cool name and sort of made sense in the context of the language being used (i.e. Elixir).
 

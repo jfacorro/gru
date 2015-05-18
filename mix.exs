@@ -33,7 +33,7 @@ defmodule Grog.Mixfile do
     [{:exreloader, github: "jfacorro/exreloader", tag: "master", only: :dev},
      {:eep, github: "virtan/eep", tag: "v1.1", only: :dev},
      {:katana, github: "inaka/erlang-katana", tag: "0.2.5", only: :dev},
-     {:shotgun, github: "inaka/shotgun", tag: "jfacorro.76.remove_lager_dep"}
+     {:shotgun, github: "inaka/shotgun", tag: "master"}
     ]
   end
 end
