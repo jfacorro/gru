@@ -4,25 +4,24 @@
   require Logger
 
   @weight 20
-  deftask get_status(state) do
-    Grog.HTTP.get(state.conn, "/status", %{}, %{name: "Status"})
-    state
+  deftask get_status(data) do
+    Grog.HTTP.get(data.conn, "/status", %{}, %{name: "Status"})
+    data
   end
 
   @weight 2
-  deftask get_contents(state) do
-    Grog.HTTP.get(state.conn, "/status", %{}, %{name: "Status"})
-    state
+  deftask get_contents(data) do
+    Grog.HTTP.get(data.conn, "/status", %{}, %{name: "Status"})
+    data
   end
 
   @weight 10
-  deftask get_featured(state) do
-    Grog.HTTP.get(state.conn, "/status", %{}, %{name: "Status"})
-    state
+  deftask get_featured(data) do
+    Grog.HTTP.get(data.conn, "/status", %{}, %{name: "Status"})
+    data
   end
 
-  def terminate(state) do
-    Grog.HTTP.close(state.conn)
+  def terminate(data) do
+    Grog.HTTP.close(data.conn)
   end
-
 end

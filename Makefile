@@ -1,14 +1,18 @@
 PROJECT=grog
 
-all: get-deps compile
+all: deps app protocols
 
 get-deps:
 	rm -f mix.lock
 	mix deps.get
 
-compile:
+deps: get-deps
 	mix deps.compile
+
+app:
 	mix compile
+
+protocols:
 	mix compile.protocols
 
 clean-deps:
@@ -18,5 +22,5 @@ clean-deps:
 clean: clean-deps
 	mix clean
 
-shell:
+shell: app
 	iex --name ${PROJECT}@`hostname` -pa _build/dev/consolidated -S mix
