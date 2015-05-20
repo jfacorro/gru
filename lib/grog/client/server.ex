@@ -1,36 +1,48 @@
 defmodule Grog.Client.Server do
   use GenServer
-  require Logger
   alias Grog.Utils
 
-  def start_link module do
-    GenServer.start_link(__MODULE__, [module])
+  def start(client, n, rate) do
+    GenServer.call(__MODULE__, {:start, client, n, rate})
   end
 
-  def init([module]) do
-    # Let's trap exits so the terminate/2 callback is called
-    Process.flag(:trap_exit, true)
-    state = %{client: module.__init__(),
-              module: module}
-    {:ok, state, wait_timeout(state)}
+  def stop do
+    GenServer.cast(__MODULE__, :stop)
+    {:stopping, Grog.Client.Supervisor.count}
   end
 
-  def handle_info :timeout, state do
-    tasks = state.module.__tasks__()
-    n = Utils.uniform(length(tasks))
-    task_name = Enum.at(tasks, n)
-    apply(state.module, task_name, [state.client])
+  ## GenServer
 
-    {:noreply, state, wait_timeout(state)}
+  def start_link do
+    GenServer.start_link(__MODULE__, nil, [name: __MODULE__])
   end
 
-  def terminate(_reason, state) do
-    state.module.terminate(state.client)
+  def handle_call({:start, client, n, rate}, _from, nil) do
+    state = %{client: client, n: n, rate: rate, now: nil}
+    {:reply, :ok, state, 0}
+  end
+  def handle_call({:start, _, _, _}, _from, state) do
+    diff = :timer.now_diff(:os.timestamp, state.now)
+    timeout = round(1000 - diff / 1000)
+    {:reply, :busy, state, timeout}
   end
 
-  ## Internal functions
+  def handle_cast(:stop, _state) do
+    Grog.Client.Supervisor.children
+    |> Enum.map(&Grog.Client.Supervisor.stop_child/1)
+    {:noreply, nil}
+  end
 
-  defp wait_timeout state do
-    Utils.uniform(state.client.min_wait, state.client.max_wait)
+  def handle_info(:timeout, %{n: 0}) do
+    {:noreply, nil}
+  end
+  def handle_info(:timeout, state) do
+    Utils.repeat(state.client, min(state.rate, state.n))
+    |> Enum.map(&Grog.Client.Supervisor.start_child/1)
+
+    state = %{state
+              | n: max(0, state.n - state.rate),
+                now: :os.timestamp()}
+    {:noreply, state, 1000}
   end
 end

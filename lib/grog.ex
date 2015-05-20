@@ -1,21 +1,22 @@
 defmodule Grog do
   require Logger
 
-  def start(client, n \\ 1000) do
-    Logger.info "Starting #{inspect n} #{inspect client}(s)"
-    Grog.Utils.repeat(client, n)
-    |> Enum.map(&Grog.Client.Supervisor.start_child/1)
+  def start(client, n, rate \\ 1) do
+    Logger.info "Starting #{inspect n} #{inspect client}(s) at #{inspect rate} clients/sec"
+    Grog.Client.Server.start(client, n, rate)
   end
 
   def stop do
-    Grog.Client.Supervisor.children()
-    |> Enum.map(&Grog.Client.Supervisor.stop_child/1)
+    Logger.info "Stopping all clients..."
+    Grog.Client.Server.stop()
+  end
+
+  def clear do
+    Grog.Metrics.Server.clear
   end
 
   def status do
-    info = Process.info(Process.whereis(Grog.Metrics.Server))
-    %{clients_count: Grog.Client.Supervisor.count.active,
-      queue_len: info[:message_queue_len],
+    %{clients_count: Grog.Client.Supervisor.count,
       metrics: Grog.Metrics.Server.get_all}
   end
 end
