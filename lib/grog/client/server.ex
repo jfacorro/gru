@@ -7,7 +7,9 @@ defmodule Grog.Client.Server do
   end
 
   def stop do
-    GenServer.call(__MODULE__, :stop)
+    GenServer.cast(__MODULE__, :stop)
+    count = Grog.Client.Supervisor.count()[:active]
+    {:stopping, count}
   end
 
   ## GenServer
@@ -25,23 +27,23 @@ defmodule Grog.Client.Server do
     timeout = round(1000 - diff / 1000)
     {:reply, :busy, state, timeout}
   end
-  def handle_call(:stop, _from, _state) do
-    count = Grog.Client.Supervisor.count
+
+  def handle_cast(:stop, _state) do
     Grog.Client.Supervisor.children
     |> Enum.map(&Grog.Client.Supervisor.stop_child/1)
-
-    {:reply, {:ok, count}, nil}
+    {:noreply, nil}
   end
 
   def handle_info(:timeout, %{n: 0}) do
     {:noreply, nil}
   end
   def handle_info(:timeout, state) do
-    IO.inspect(state)
     Utils.repeat(state.client, min(state.rate, state.n))
     |> Enum.map(&Grog.Client.Supervisor.start_child/1)
 
-    state = %{state | n: max(0, state.n - state.rate), now: :os.timestamp()}
+    state = %{state
+              | n: max(0, state.n - state.rate),
+                now: :os.timestamp()}
     {:noreply, state, 1000}
   end
 end
