@@ -95,6 +95,15 @@ defmodule Grog.Utils do
     _leading_zeros(:erlang.bsr(n, 1), x + 1)
   end
 
+  @doc """
+  Throws if the first argument is not true.
+  """
+  def assert(bool, msg) do
+    case bool do
+      true -> :ok
+      false -> throw({:badarg, msg})
+    end
+  end
 
   ## Internal
 

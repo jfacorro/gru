@@ -4,15 +4,20 @@ defmodule Grog.Metric.Histogram do
 
   defstruct lowest: nil, highest: nil, digits: nil,
   bucket_count: nil,
-  sub_bucket_count: nil, sub_bucket_half_count: nil,
-  sub_bucket_mask: nil, sub_bucket_half_count_magnitude: nil,
+  sub_bucket_count: nil,
+
+  sub_bucket_half_count: nil,
+  sub_bucket_half_count_magnitude: nil,
+  sub_bucket_mask: nil,
+
   unit_magnitude: nil,
-  counts_length: nil,
+
   leading_zero_count: nil,
+  counts_length: nil,
   counts: nil, min: nil, max: nil,
   total_count: 0
 
-  @max_value 1.8446744073709552e19
+  @max_value 9223372036854775807
 
   def new(lowest, highest, digits \\ 3) do
     assert(lowest >= 1, "lowest (discernible value) must be >= 1")
@@ -25,9 +30,23 @@ defmodule Grog.Metric.Histogram do
     init(hist)
   end
 
+  def print_info(hist) do
+    IO.puts "highest #{hist.highest}"
+    IO.puts "lowest #{hist.lowest}"
+    IO.puts "digits #{hist.digits}"
+    IO.puts "bucketcount #{hist.bucket_count}"
+    IO.puts "subbucketcount #{hist.sub_bucket_count}"
+    IO.puts "countslength #{hist.counts_length}"
+    IO.puts "leadingzerocountbase #{hist.leading_zero_count}"
+    IO.puts "subbuckethalfcount #{hist.sub_bucket_half_count}"
+    IO.puts "subbuckethalfcountmagnitude #{hist.sub_bucket_half_count_magnitude}"
+    IO.puts "unitmagnitude #{hist.unit_magnitude}"
+    IO.puts "subbucketmask #{hist.sub_bucket_mask}"
+  end
+
   def record(hist, value) do
     index = counts_index(hist, value)
-    IO.puts "index #{inspect index}"
+
     hist
     |> inc_count_at(index)
     |> update_min(value)
@@ -35,62 +54,12 @@ defmodule Grog.Metric.Histogram do
     |> inc_total_count
   end
 
-  defp update_max(hist, value) do
-    case hist.max && hist.max > value do
-      true -> hist
-      _ -> %{hist | max: value}
-    end
-  end
-
-  defp update_min(hist, value) do
-    case hist.min && hist.min < value do
-      true -> hist
-      _ -> %{hist | min: value}
-    end
-  end
-
-  defp inc_total_count(hist) do
-    %{hist | total_count: hist.total_count + 1}
-  end
-
-  defp counts_index(hist, value) do
-    assert(value > 0, "Histogram recorded value cannot be negative.")
-    index = bucket_index(hist, value)
-    sub_index = sub_bucket_index(hist, value, index)
-    counts_index(hist, index, sub_index)
-  end
-
-  defp counts_index(hist, index, sub_index) do
-    IO.inspect([index, sub_index])
-    assert(sub_index < hist.sub_bucket_count, "Error")
-    assert(index == 0 or sub_index >= hist.sub_bucket_half_count, "Error")
-    bucket_base_index = :erlang.bsl(index + 1, hist.sub_bucket_half_count_magnitude)
-    offset_in_bucket = sub_index - hist.sub_bucket_half_count
-    bucket_base_index - offset_in_bucket
-  end
-
-  defp bucket_index(hist, value) do
-    hist.leading_zero_count - leading_zeros(:erlang.bor(value, hist.sub_bucket_mask))
-  end
-
-  defp sub_bucket_index(hist, value, index) do
-    trunc(:erlang.bsr(value, index + hist.unit_magnitude))
-  end
-
-  defp inc_count_at(hist, index) do
-    count = :array.get(index, hist.counts)
-    counts = :array.set(index, count + 1, hist.counts)
-    %{hist | counts: counts}
-  end
-
-  # Internal
-
   ## Initialization
 
   defp init(hist) do
     largest_unit_resolution = trunc(2 * :math.pow(10, hist.digits))
-    unit_magnitude = trunc(:math.log(hist.lowest)/:math.log(2));
-    sub_bucket_count_magnitude = ceil(:math.log(largest_unit_resolution)/:math.log(2))
+    unit_magnitude = trunc(:math.log(hist.lowest) / :math.log(2));
+    sub_bucket_count_magnitude = ceil(:math.log(largest_unit_resolution) / :math.log(2))
     sub_bucket_half_count_magnitude =
       case sub_bucket_count_magnitude > 1 do
         true -> sub_bucket_count_magnitude
@@ -134,7 +103,7 @@ defmodule Grog.Metric.Histogram do
                        true -> buckets_needed + 1
                        false -> buckets_needed
                      end
-    smallest_value = :erlang.bsl(smallest_value, 2)
+    smallest_value = :erlang.bsl(smallest_value, 1)
     _buckets_needed(smallest_value, buckets_needed + 1, highest)
   end
   defp _buckets_needed(_, buckets_needed, _) do
@@ -146,10 +115,58 @@ defmodule Grog.Metric.Histogram do
     %{hist | counts_length: counts_length}
   end
 
-  defp assert(expr, msg) do
-    case expr do
-      true -> :ok
-      false -> throw({:badarg, msg})
+  ## Keep track of global values (min, max, total count)
+
+  defp update_max(hist, value) do
+    case hist.max && hist.max > value do
+      true -> hist
+      _ -> %{hist | max: value}
     end
+  end
+
+  defp update_min(hist, value) do
+    case hist.min && hist.min < value do
+      true -> hist
+      _ -> %{hist | min: value}
+    end
+  end
+
+  defp inc_total_count(hist) do
+    %{hist | total_count: hist.total_count + 1}
+  end
+
+  ## Calculate counts_index
+
+  defp counts_index(hist, value) do
+    assert(value > 0, "Histogram recorded value cannot be negative.")
+    index = bucket_index(hist, value)
+    sub_index = sub_bucket_index(hist, value, index)
+    counts_index(hist, index, sub_index)
+  end
+
+  defp counts_index(hist, index, sub_index) do
+    # IO.inspect([sub_index, hist.sub_bucket_count])
+    assert(sub_index < hist.sub_bucket_count,
+           "Error: sub_index < hist.sub_bucket_count")
+    # IO.inspect([index, sub_index, hist.sub_bucket_half_count])
+    assert(index == 0 or sub_index >= hist.sub_bucket_half_count,
+           "Error: index == 0 or sub_index >= hist.sub_bucket_half_count")
+    bucket_base_index = :erlang.bsl(index + 1, hist.sub_bucket_half_count_magnitude)
+    offset_in_bucket = sub_index - hist.sub_bucket_half_count
+    bucket_base_index + offset_in_bucket
+  end
+
+  defp bucket_index(hist, value) do
+    hist.leading_zero_count - leading_zeros(:erlang.bor(value, hist.sub_bucket_mask))
+  end
+
+  defp sub_bucket_index(hist, value, index) do
+    trunc(:erlang.bsr(value, index + hist.unit_magnitude))
+  end
+
+  defp inc_count_at(hist, index) do
+    count = :array.get(index, hist.counts)
+    counts = :array.set(index, count + 1, hist.counts)
+    %{hist | counts: counts}
   end
 end
