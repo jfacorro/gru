@@ -1,8 +1,8 @@
-defmodule Grog.Metrics.Max do
-  alias Grog.Metrics.Max
+defmodule Grog.Metric.Max do
+  alias Grog.Metric.Max
   defstruct name: "", max: nil
 
-  defimpl Grog.Metrics.Metric, for: Max do
+  defimpl Grog.Metric, for: Max do
     def name(metric), do: metric.name
 
     def value(metric), do: metric.max

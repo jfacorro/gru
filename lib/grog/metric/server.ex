@@ -1,7 +1,7 @@
-defmodule Grog.Metrics.Server do
+defmodule Grog.Metric.Server do
   use GenServer
   require Logger
-  alias Grog.Metrics.Metric
+  alias Grog.Metric
 
   @datastore __MODULE__
 
