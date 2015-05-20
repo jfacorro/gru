@@ -8,8 +8,7 @@ defmodule Grog.Client.Server do
 
   def stop do
     GenServer.cast(__MODULE__, :stop)
-    count = Grog.Client.Supervisor.count()[:active]
-    {:stopping, count}
+    {:stopping, Grog.Client.Supervisor.count}
   end
 
   ## GenServer

@@ -11,8 +11,12 @@ defmodule Grog do
     Grog.Client.Server.stop()
   end
 
+  def clear do
+    Grog.Metrics.Server.clear
+  end
+
   def status do
-    %{clients_count: Grog.Client.Supervisor.count.active,
+    %{clients_count: Grog.Client.Supervisor.count,
       metrics: Grog.Metrics.Server.get_all}
   end
 end

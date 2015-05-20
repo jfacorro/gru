@@ -15,7 +15,7 @@ defmodule Grog.Client.Supervisor do
   ## API
 
   def count do
-    Supervisor.count_children(__MODULE__)
+    Supervisor.count_children(__MODULE__).active
   end
 
   def children do
