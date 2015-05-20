@@ -2,12 +2,12 @@ defmodule Grog.HTTP do
   require Logger
   require Grog.Utils
   alias Grog.Utils
-  alias Grog.Metrics.Server, as: Metrics
-  alias Grog.Metrics.Count
-  alias Grog.Metrics.CountInterval
-  alias Grog.Metrics.Average
-  alias Grog.Metrics.Min
-  alias Grog.Metrics.Max
+  alias Grog.Metric.Server, as: Metric
+  alias Grog.Metric.Count
+  alias Grog.Metric.CountInterval
+  alias Grog.Metric.Average
+  alias Grog.Metric.Min
+  alias Grog.Metric.Max
 
   @timeout :infinity
 
@@ -64,19 +64,19 @@ defmodule Grog.HTTP do
   ## Internal
 
   defp report_general() do
-    Metrics.report(%Count{name: "# Requests"}, 1)
-    Metrics.report(%CountInterval{name: "# Requests/sec", interval: 1000}, 1)
+    Metric.report(%Count{name: "# Requests"}, 1)
+    Metric.report(%CountInterval{name: "# Requests/sec", interval: 1000}, 1)
   end
 
   defp report_success(name, time_ms) do
-    Metrics.report(%Count{name: name}, 1)
-    Metrics.report(%Average{name: name}, time_ms)
-    Metrics.report(%Min{name: name}, time_ms)
-    Metrics.report(%Max{name: name}, time_ms)
+    Metric.report(%Count{name: name}, 1)
+    Metric.report(%Average{name: name}, time_ms)
+    Metric.report(%Min{name: name}, time_ms)
+    Metric.report(%Max{name: name}, time_ms)
   end
 
   defp report_error(name, status_code) do
     id = {name, status_code}
-    Metrics.report(%Count{name: id}, 1)
+    Metric.report(%Count{name: id}, 1)
   end
 end

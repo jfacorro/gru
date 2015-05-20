@@ -5,7 +5,7 @@ defmodule Grog.App do
     import Supervisor.Spec
     children = [worker(Grog.Client.Server, []),
                 supervisor(Grog.Client.Supervisor, []),
-                worker(Grog.Metrics.Server, [])]
+                worker(Grog.Metric.Server, [])]
     opts = [strategy: :one_for_one,
             name: Grog.Supervisor]
 
