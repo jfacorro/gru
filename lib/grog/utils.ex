@@ -67,6 +67,35 @@ defmodule Grog.Utils do
     uniform(0, to)
   end
 
+  @doc """
+  Return the ceiling of the number provided.
+  """
+  def ceil(n) do
+    x = trunc(n)
+    case n - x > 0 do
+      true -> x + 1
+      false -> x
+    end
+  end
+
+  @doc """
+  Returns the  number of leading zeros of the provided integer.
+  """
+  def leading_zeros(0) do
+    64
+  end
+  def leading_zeros(n) when is_integer(n) do
+    _leading_zeros(n, 0)
+  end
+
+  defp _leading_zeros(0, x) do
+    leading_zeros(0) - x
+  end
+  defp _leading_zeros(n, x) do
+    _leading_zeros(:erlang.bsr(n, 1), x + 1)
+  end
+
+
   ## Internal
 
   defp ensure_seed() do
