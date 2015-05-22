@@ -44,7 +44,7 @@ defmodule Grog.Utils do
   """
   def profile(time \\ 1000)do
     {{y, m, d}, {hh, mm, ss}} = :calendar.universal_time()
-    ymd_hhmmss = "#{inspect y}#{inspect m}#{inspect d}#{inspect hh}#{inspect mm}#{inspect ss}"
+    ymd_hhmmss = "#{inspect y}#{inspect m}#{inspect d}_#{inspect hh}#{inspect mm}#{inspect ss}"
     filename = 'filename-' ++ String.to_char_list(ymd_hhmmss)
     :eep.start_file_tracing(filename)
     :timer.sleep(time)
