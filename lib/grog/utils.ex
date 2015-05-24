@@ -89,7 +89,7 @@ defmodule Grog.Utils do
   end
 
   defp _leading_zeros(0, x) do
-    leading_zeros(0) - x
+    64 - x
   end
   defp _leading_zeros(n, x) do
     _leading_zeros(:erlang.bsr(n, 1), x + 1)

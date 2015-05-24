@@ -1,6 +1,7 @@
 defmodule Grog.HdrHistogram do
   alias Grog.HdrHistogram
   import Grog.Utils
+  require Grog.Utils
 
   defstruct lowest: nil, highest: nil, digits: nil,
   bucket_count: nil,
@@ -18,6 +19,22 @@ defmodule Grog.HdrHistogram do
   total_count: 0
 
   @max_value 9223372036854775807
+
+  def perf(n, highest, digits) do
+    IO.puts "Starting perf..."
+    hist = new(1, highest, digits)
+    {time, hist} = time(_perf_loop(hist, highest, n))
+    IO.puts "Elapsed: #{inspect time / 1000} msecs"
+    hist
+  end
+
+  defp _perf_loop(hist, _highest, 0) do
+    hist
+  end
+  defp _perf_loop(hist, highest, i) do
+    hist = record(hist, uniform(highest))
+    _perf_loop(hist, highest, i - 1)
+  end
 
   def new(lowest, highest, digits \\ 3) do
     assert(lowest >= 1, "lowest (discernible value) must be >= 1")
