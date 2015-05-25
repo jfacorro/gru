@@ -24,3 +24,6 @@ clean: clean-deps
 
 shell: app
 	iex --name ${PROJECT}@`hostname` -pa _build/dev/consolidated -S mix
+
+escript:
+	mix escript.build

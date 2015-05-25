@@ -5,7 +5,8 @@ defmodule Grog.Mixfile do
     [app: :grog,
      version: "0.0.1",
      elixir: "~> 1.0",
-     deps: deps]
+     deps: deps,
+     escript: escript]
   end
 
   # Configuration for the OTP application
@@ -34,5 +35,16 @@ defmodule Grog.Mixfile do
 
      {:shotgun, github: "inaka/shotgun", tag: "master"}
     ]
+  end
+
+  # Configuration used to generate an escript file.
+  #
+  # The module specified in :main_module should have a
+  # main/1 function declared.
+  #
+  # Type `mix help escript.build` for more information
+  def escript do
+    [main_module: Grog.CLI,
+     path: "bin/grog"]
   end
 end

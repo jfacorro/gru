@@ -40,14 +40,15 @@ defmodule Grog.Client do
       Module.register_attribute(__MODULE__, :tasks, accumulate: true)
 
       def __init__ do
-        Dict.merge(%{}, unquote(opts))
+        data = Dict.merge(%{}, unquote(opts))
+        init(data)
       end
 
-      def terminate(data) do
-        :ok
-      end
+      def init(data), do: data
 
-      defoverridable [terminate: 1]
+      def terminate(data), do: :ok
+
+      defoverridable [init: 1, terminate: 1]
     end
   end
 
