@@ -8,6 +8,7 @@ defmodule Grog.HTTP do
   alias Grog.Metric.Average
   alias Grog.Metric.Min
   alias Grog.Metric.Max
+  alias Grog.Metric.Percentiles
 
   @timeout :infinity
 
@@ -49,30 +50,37 @@ defmodule Grog.HTTP do
     opts = Map.put(opts, :timeout, @timeout)
     {time, value} = Utils.time(:shotgun.request(conn, method, path_str, headers, body, opts))
 
-    report_general()
+    report_general(time)
+
     case value do
       {:ok, %{status_code: status_code}} when status_code < 400 ->
-        report_success(opts[:name] || path, time / 1000)
+        report_success(opts[:name] || path, time)
       {:ok, %{status_code: status_code}} ->
         report_error(opts[:name] || path, status_code)
       {:error, reason} ->
         report_error(:error, reason)
     end
+
     value
   end
 
   ## Internal
 
-  defp report_general() do
+  defp report_general(time_us) do
     Metric.report(%Count{name: "# Requests"}, 1)
-    Metric.report(%CountInterval{name: "# Requests/sec", interval: 1000}, 1)
+    Metric.report(%CountInterval{name: "# Reqs/sec", interval: 1000}, 1)
+    Metric.report(%Percentiles{name: "Total"}, time_us)
   end
 
-  defp report_success(name, time_ms) do
+  defp report_success(name, time_us) do
+    time_ms = time_us / 1000
     Metric.report(%Count{name: name}, 1)
     Metric.report(%Average{name: name}, time_ms)
     Metric.report(%Min{name: name}, time_ms)
     Metric.report(%Max{name: name}, time_ms)
+    Metric.report(%CountInterval{name: name, interval: 1000}, 1)
+
+    Metric.report(%Percentiles{name: name}, time_us)
   end
 
   defp report_error(name, status_code) do

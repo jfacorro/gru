@@ -44,7 +44,7 @@ defmodule Grog.Utils do
   """
   def profile(time \\ 1000)do
     {{y, m, d}, {hh, mm, ss}} = :calendar.universal_time()
-    ymd_hhmmss = "#{inspect y}#{inspect m}#{inspect d}#{inspect hh}#{inspect mm}#{inspect ss}"
+    ymd_hhmmss = "#{inspect y}#{inspect m}#{inspect d}_#{inspect hh}#{inspect mm}#{inspect ss}"
     filename = 'filename-' ++ String.to_char_list(ymd_hhmmss)
     :eep.start_file_tracing(filename)
     :timer.sleep(time)
@@ -65,6 +65,44 @@ defmodule Grog.Utils do
   """
   def uniform(to) do
     uniform(0, to)
+  end
+
+  @doc """
+  Return the ceiling of the number provided.
+  """
+  def ceil(n) do
+    x = trunc(n)
+    case n - x > 0 do
+      true -> x + 1
+      false -> x
+    end
+  end
+
+  @doc """
+  Returns the  number of leading zeros of the provided integer.
+  """
+  def leading_zeros(0) do
+    64
+  end
+  def leading_zeros(n) when is_integer(n) do
+    _leading_zeros(n, 0)
+  end
+
+  defp _leading_zeros(0, x) do
+    64 - x
+  end
+  defp _leading_zeros(n, x) do
+    _leading_zeros(:erlang.bsr(n, 1), x + 1)
+  end
+
+  @doc """
+  Throws if the first argument is not true.
+  """
+  def assert(bool, msg) do
+    case bool do
+      true -> :ok
+      false -> throw({:badarg, msg})
+    end
   end
 
   ## Internal
