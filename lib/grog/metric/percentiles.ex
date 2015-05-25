@@ -3,9 +3,9 @@ defmodule Grog.Metric.Percentiles do
   alias Grog.HdrHistogram
   defstruct name: "", hist: HdrHistogram.new(1, 3600000000, 1)
 
-  @percentiles [50, 66, 75, 80, 90, 95, 98, 99, 100]
-
   defimpl Grog.Metric, for: Percentiles do
+    @percentiles [50, 66, 75, 80, 90, 95, 98, 99, 100]
+
     def name(metric), do: metric.name
 
     def value(metric) do

@@ -79,7 +79,8 @@ defmodule Grog.Utils do
   end
 
   @doc """
-  Returns the  number of leading zeros of the provided integer.
+  Returns the  number of leading zeros of the provided integer
+  assuming a 64 bit representation.
   """
   def leading_zeros(0) do
     64
