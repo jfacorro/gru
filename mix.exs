@@ -14,9 +14,7 @@ defmodule Grog.Mixfile do
   def application do
     [mod: {Grog.App, []},
      registered: [Grog.Client.Supervisor],
-     applications: [:logger,
-                    :exreloader,
-                    :shotgun]]
+     applications: [:logger, :shotgun]]
   end
 
   # Dependencies can be Hex packages:

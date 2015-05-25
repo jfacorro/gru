@@ -42,6 +42,12 @@ defmodule Grog.Client do
       def __init__ do
         Dict.merge(%{}, unquote(opts))
       end
+
+      def terminate(data) do
+        :ok
+      end
+
+      defoverridable [terminate: 1]
     end
   end
 
