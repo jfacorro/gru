@@ -61,7 +61,6 @@ defmodule Grog.HdrHistogram do
     percentile = min(percentile, 100)
     count_percentile = trunc(percentile / 100 * hist.total_count + 0.5)
     count_percentile = max(count_percentile, 0)
-    IO.puts "count_perc #{inspect count_percentile}"
 
     iterate_fn = fn {index, count} ->
       {index + 1,
