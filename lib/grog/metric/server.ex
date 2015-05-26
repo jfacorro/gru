@@ -1,6 +1,5 @@
 defmodule Grog.Metric.Server do
   use GenServer
-  require Logger
   alias Grog.Metric
 
   @datastore __MODULE__
@@ -38,13 +37,8 @@ defmodule Grog.Metric.Server do
   end
 
   def init([]) do
-    Logger.info("Starting #{inspect __MODULE__}")
     create_table(@datastore)
     {:ok, {}}
-  end
-
-  def terminate(_reason, _state) do
-    Logger.info("Terminating '#{inspect __MODULE__}'")
   end
 
   ## Internal

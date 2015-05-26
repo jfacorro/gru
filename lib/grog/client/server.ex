@@ -2,8 +2,8 @@ defmodule Grog.Client.Server do
   use GenServer
   alias Grog.Utils
 
-  def start(client, n, rate) do
-    GenServer.call(__MODULE__, {:start, client, n, rate})
+  def start(clients, n, rate) when is_list(clients) do
+    GenServer.call(__MODULE__, {:start, clients, n, rate})
   end
 
   def stop do
@@ -17,8 +17,8 @@ defmodule Grog.Client.Server do
     GenServer.start_link(__MODULE__, nil, [name: __MODULE__])
   end
 
-  def handle_call({:start, client, n, rate}, _from, nil) do
-    state = %{client: client, n: n, rate: rate, now: nil}
+  def handle_call({:start, clients, n, rate}, _from, nil) do
+    state = %{clients: clients, n: n, rate: rate, now: nil}
     {:reply, :ok, state, 0}
   end
   def handle_call({:start, _, _, _}, _from, state) do
@@ -37,12 +37,25 @@ defmodule Grog.Client.Server do
     {:noreply, nil}
   end
   def handle_info(:timeout, state) do
-    Utils.repeat(state.client, min(state.rate, state.n))
+    state.clients
+    |> clients_list(min(state.rate, state.n))
     |> Enum.map(&Grog.Client.Supervisor.start_child/1)
 
     state = %{state
               | n: max(0, state.n - state.rate),
                 now: :os.timestamp()}
     {:noreply, state, 1000}
+  end
+
+  ## Internal
+
+  defp clients_list(clients, n) do
+    total = Enum.reduce(clients, 0, fn(client, acc) -> acc + client.weight end)
+    f = fn client -> Utils.repeat(client, Utils.ceil(client.weight / total * n)) end
+
+    clients
+    |> Enum.flat_map(f)
+    |> Enum.take(n)
+    |> Enum.shuffle
   end
 end

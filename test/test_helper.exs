@@ -1,4 +1,4 @@
-ExUnit.start()
+# ExUnit.start()
 
 defmodule GrogTest.Client.Tasks do
   use Grog.Client.Tasks
@@ -14,6 +14,12 @@ end
 
 defmodule GrogTest.Client do
   use Grog.Client, name: "Test Client",
-                   min_wait: 500, max_wait: 1000,
-                   tasks_module: GrogTest.Client.Tasks
+  min_wait: 500, max_wait: 1000, weight: 10,
+  tasks_module: GrogTest.Client.Tasks
+end
+
+defmodule GrogTest.Client2 do
+  use Grog.Client, name: "Test Client 2",
+  min_wait: 500, max_wait: 1000, weight: 5,
+  tasks_module: GrogTest.Client.Tasks
 end

@@ -35,10 +35,23 @@ defmodule Grog.Client do
   ## __using__ and its functionality
 
   defmacro __using__(opts) do
+    weight = opts[:weight]
     quote do
+      Module.register_attribute(__MODULE__, :grog_client, persist: true)
+      @grog_client true
+
+      @default %{min_wait: 1000,
+                 max_wait: 5000,
+                 weight: 10,
+                 tasks_module: nil}
+
       def __init__ do
-        data = Dict.merge(%{}, unquote(opts))
+        data = Dict.merge(@default, unquote(opts))
         init(data)
+      end
+
+      def weight do
+        unquote(weight)
       end
 
       def init(data), do: data
