@@ -18,10 +18,12 @@ defmodule Grog.Client do
   end
 
   def handle_info(:timeout, state) do
-    tasks = state.module.__tasks__()
-    n = Utils.uniform(length(tasks))
-    task_name = Enum.at(tasks, n)
-    apply(state.module, task_name, [state.client])
+    tasks = state.client.tasks_module.__tasks__()
+    if tasks != [] do
+      n = Utils.uniform(length(tasks))
+      task_name = Enum.at(tasks, n)
+      apply(state.client.tasks_module, task_name, [state.client])
+    end
 
     {:noreply, state, wait_timeout(state)}
   end
@@ -33,43 +35,31 @@ defmodule Grog.Client do
   ## __using__ and its functionality
 
   defmacro __using__(opts) do
+    weight = opts[:weight]
     quote do
-      import unquote(__MODULE__), only: [deftask: 2]
-      @before_compile Grog.Client
-      # Accumulate tasks with their weights
-      Module.register_attribute(__MODULE__, :tasks, accumulate: true)
+      Module.register_attribute(__MODULE__, :grog_client, persist: true)
+      @grog_client true
+
+      @default %{min_wait: 1000,
+                 max_wait: 5000,
+                 weight: 10,
+                 tasks_module: nil}
 
       def __init__ do
-        Dict.merge(%{}, unquote(opts))
+        data = Dict.merge(@default, unquote(opts))
+        init(data)
       end
 
-      def terminate(data) do
-        :ok
+      def weight do
+        unquote(weight)
       end
 
-      defoverridable [terminate: 1]
-    end
-  end
+      def init(data), do: data
 
-  defmacro __before_compile__(_env) do
-    tasks = Module.get_attribute(__CALLER__.module, :tasks)
-            |> Enum.flat_map( fn {name, weight} -> Grog.Utils.repeat(name, weight) end)
-            |> Enum.reverse
-    quote do
-      def __tasks__, do: unquote(tasks)
-    end
-  end
+      def terminate(data), do: :ok
 
-  defmacro deftask(definition = {name, _, _}, do: contents) do
-    quote do
-      Grog.Client.__on_definition__(__ENV__, unquote(name))
-      def unquote(definition), do: unquote(contents)
+      defoverridable [init: 1, terminate: 1]
     end
-  end
-
-  def __on_definition__(env, name) do
-    weights = Module.get_attribute(env.module, :weight) || 1
-    Module.put_attribute(env.module, :tasks, {name, weights})
   end
 
   ## Internal functions
