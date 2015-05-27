@@ -99,10 +99,26 @@ defmodule Grog.Utils do
   @doc """
   Throws if the first argument is not true.
   """
-  def assert(bool, msg) do
-    case bool do
-      true -> :ok
-      false -> throw({:badarg, msg})
+  defmacro assert(expr, error \\ AssertError, msg \\ "Assertion failed: ") do
+    expr_str = Macro.to_string(expr)
+    quote do
+      case unquote(expr) do
+        true -> :ok
+        false -> raise unquote(error), message: "#{unquote(msg)}#{unquote(expr_str)}"
+      end
+    end
+  end
+
+  defmodule AssertError do
+    defexception message: "assert error"
+
+    @spec exception(String.t) :: Exception.t
+    def exception(msg) when is_binary(msg) do
+      %AssertError{message: msg}
+    end
+
+    def exception(arg) do
+      super(arg)
     end
   end
 
