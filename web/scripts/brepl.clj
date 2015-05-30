@@ -3,8 +3,8 @@
   '[cljs.repl.browser :as browser])
 
 (repl/repl (browser/repl-env)
-           :watch "src"
            :output-dir "out"
+           :watch "src"
            :optimizations :none
            :cache-analysis true
            :source-map true)

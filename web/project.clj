@@ -3,7 +3,9 @@
   :url "http://example.com/FIXME"
 
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [org.clojure/clojurescript "0.0-2755"]]
+                 [org.clojure/clojurescript "0.0-2755"]
+
+                 [prismatic/dommy "1.1.0"]]
 
   :node-dependencies [[source-map-support "0.2.8"]]
 
@@ -12,15 +14,15 @@
 
   :source-paths ["src" "target/classes"]
 
-  :clean-targets ["out" "out-adv"]
+  :clean-targets ["js" "js-adv"]
 
   :cljsbuild {
     :builds [{:id "dev"
               :source-paths ["src"]
               :compiler {
                 :main gru.core
-                :output-to "out/gru.js"
-                :output-dir "out"
+                :output-to "js/gru.js"
+                :output-dir "js"
                 :optimizations :none
                 :cache-analysis true
                 :source-map true}}
@@ -28,7 +30,7 @@
               :source-paths ["src"]
               :compiler {
                 :main gru.core
-                :output-to "out-adv/gru.min.js"
-                :output-dir "out-adv"
+                :output-to "js-adv/gru.min.js"
+                :output-dir "js-adv"
                 :optimizations :advanced
                 :pretty-print false}}]})
