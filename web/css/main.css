@@ -1,0 +1,33 @@
+body {
+    background-color: #2C4A6A;
+}
+
+nav {
+    background-color: #23303E !important;
+    border: none;
+    color: #FFF;
+}
+
+nav .logo {
+    float: left;
+    width: 45px;
+    margin: 2.5px 0px;
+}
+
+#controls {
+    float: right;
+    height: 50px;
+}
+
+#controls button {
+    margin: 8px 0px;
+}
+
+#controls .info {
+    display: inline-block;
+    width: 100px;
+}
+
+#status {
+    margin-right: 5px;
+}

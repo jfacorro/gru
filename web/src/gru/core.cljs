@@ -11,7 +11,7 @@
 (defn visible! [elem show?]
   (dom/set-style! elem
                  :display
-                 (if show? "block" "none")))
+                 (if show? "inline-block" "none")))
 
 (defn log [x]
   (.log js/console x))
