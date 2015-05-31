@@ -1,5 +1,7 @@
 (ns gru.core
-  (:require [dommy.core :as dom :refer-macros [sel sel1]]))
+  (:require [dommy.core :as dommy :refer-macros [sel sel1]]
+            [om.core :as om]
+            [om.dom :as dom]))
 
 (enable-console-print!)
 
@@ -8,32 +10,44 @@
                           :rate nil
                           :metrics []}))
 
-(defn visible! [elem show?]
-  (dom/set-style! elem
-                 :display
-                 (if show? "inline-block" "none")))
-
 (defn log [x]
   (.log js/console x))
 
-(defn running? [state]
-  (= (:status @state) :running))
+(defn status [data owner]
+  (om/component
+   (dom/span nil
+             (case (:status data)
+               :stopped "Stopped"
+               :running "Running"))))
 
-(defn update-view [state]
-  (visible! (sel1 :#stop) (running? state))
-  (visible! (sel1 :#start) (not (running? state))))
+;; Start & Stop
 
-(defn start [e]
-  (swap! app-state assoc :status :running)
-  (update-view app-state))
+(defn start [data event]
+  (om/transact! data :status #(do % :running)))
 
-(defn stop [e]
-  (swap! app-state assoc :status :stopped)
-  (update-view app-state))
+(defn stop [data event]
+  (om/transact! data :status #(do % :stopped)))
 
-(defn init []
-  (dom/listen! (sel1 :#start) :click start)
-  (dom/listen! (sel1 :#stop) :click stop)
-  (update-view app-state))
+(defn start-button [data owner]
+  (dom/button #js {:className "btn btn-success"
+                   :onClick (partial start data)}
+              "Start"))
 
-(init)
+(defn stop-button [data owner]
+  (dom/button #js {:className "btn btn-danger"
+                   :onClick (partial stop data)}
+              "Stop"))
+
+(defn start-stop [data owner]
+  (om/component
+   (case (:status data)
+     :stopped (start-button data owner)
+     :running (stop-button data owner))))
+
+(om/root status
+         app-state
+         {:target (dommy/sel1 :#status)})
+
+(om/root start-stop
+         app-state
+         {:target (dommy/sel1 :#start-stop)})

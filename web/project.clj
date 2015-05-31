@@ -5,6 +5,7 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/clojurescript "0.0-2755"]
 
+                 [org.omcljs/om "0.8.8"]
                  [prismatic/dommy "1.1.0"]]
 
   :node-dependencies [[source-map-support "0.2.8"]]

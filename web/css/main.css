@@ -26,8 +26,13 @@ nav .logo {
 #controls .info {
     display: inline-block;
     width: 100px;
+    text-align: center;
 }
 
 #status {
     margin-right: 5px;
+}
+
+#start-stop {
+    display: inline-block;
 }
