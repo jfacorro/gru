@@ -1,14 +1,15 @@
 defmodule Grog.Web.Utils do
   require Plug.Router
 
-  defmacro static(at, root, from \\ nil) do
+  defmacro static(at, from \\ nil) do
     expr = quote do
       "/" <> Enum.join(var!(conn).path_info, "/")
     end
 
     quote do
       get unquote(at) do
-        path = unquote(root) <> unquote(from || expr)
+        root = Map.get(var!(conn).private, :root)
+        path = root <> unquote(from || expr)
         ext = :filename.extension(path) |> String.replace(".", "")
         mime_types =  %{"js" => "application/javascript",
                         "css" => "text/css",

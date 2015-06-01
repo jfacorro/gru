@@ -75,6 +75,8 @@
      :stopped (start-button data owner)
      :running (stop-button data owner))))
 
+;; Metrics Table
+
 (defn col-view [data owner]
   (om/component (dom/td nil data)))
 

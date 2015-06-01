@@ -6,17 +6,26 @@ defmodule Grog.Web.Router do
 
   @root System.get_env("HOME") <> "/.grog"
 
-  static "/", @root, "/index.html"
-  static "/index.html", @root, "/index.html"
-  static "/js/*_", @root
-  static "/css/*_", @root
-  static "/img/*_", @root
+  def call(conn, opts) do
+    conn
+    |> put_private(:root, opts[:root] || @root)
+    |> put_private(:clients, opts[:clients])
+    |> super(opts)
+  end
+
+  static "/", "/index.html"
+  static "/index.html", "/index.html"
+  static "/js/*_"
+  static "/css/*_"
+  static "/img/*_"
 
   get "/api/status" do
     send_resp(conn, 200, "{}")
   end
 
   post "/api/start" do
+    clients = Map.get(conn.private, :clients)
+    Grog.start clients, 1000, 10
     send_resp(conn, 200, "{'status':'started'}")
   end
 

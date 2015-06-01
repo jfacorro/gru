@@ -1,8 +1,9 @@
 defmodule Grog.Web do
   alias Plug.Adapters.Cowboy
 
-  def start(port) do
-    Cowboy.http Grog.Web.Router, [], port: port
+  def start(clients, port, root) do
+    opts = [clients: clients, root: root]
+    Cowboy.http Grog.Web.Router, opts, port: port
   end
 
   def stop do
