@@ -5,7 +5,7 @@
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/main.css" rel="stylesheet">
 
-     <link rel="icon" href="img/favicon.ico">
+    <link rel="icon" href="img/favicon.ico">
   </head>
   <body>
     <!-- Fixed navbar -->
@@ -27,6 +27,40 @@
         </div>
       </div>
     </nav>
+    <div class="container main">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <td>Type</td>
+            <td>Name</td>
+            <td># reqs.</td>
+            <td># fails</td>
+            <td>Median</td>
+            <td>Avg.</td>
+            <td>Min</td>
+            <td>Max</td>
+            <td>Content Size</td>
+            <td># reqs./sec</td>
+          </tr>
+        </thead>
+        <tbody id="metrics">
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>-</td>
+            <td>Total</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/gru.js" type="text/javascript"></script>
