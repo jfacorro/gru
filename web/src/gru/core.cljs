@@ -54,10 +54,7 @@
                            :total {:reqs-sec 10}})))
 
 (defn stop [data _]
-  (om/transact! data
-                #(merge % {:status :stopped
-                           :count nil
-                           :rate nil})))
+  (om/transact! data #(merge % {:status :stopped})))
 
 (defn start-button [data owner]
   (dom/button #js {:className "btn btn-success"

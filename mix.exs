@@ -31,6 +31,7 @@ defmodule Grog.Mixfile do
     [{:cowboy, github: "ninenines/cowboy", tag: "1.0.1", override: true},
      {:plug, "~> 0.12.2"},
      {:shotgun, github: "inaka/shotgun", tag: "master"},
+     {:ex_edn, github: "jfacorro/ExEdn", tag: "0.1.1"},
 
      {:exreloader, github: "jfacorro/exreloader", tag: "master", only: :dev},
      {:eep, github: "virtan/eep", tag: "v1.1", only: :dev},

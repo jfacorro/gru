@@ -20,13 +20,26 @@ defmodule Grog.Web.Router do
   static "/img/*_"
 
   get "/api/status" do
-    send_resp(conn, 200, "{}")
+    send_resp(conn, 200, ExEdn.encode!(Grog.status))
   end
 
-  post "/api/start" do
+  ## POST /api/clients
+  ## The body of the request should be a map with two keys:
+  ##  - :count - the total amount of clients to start.
+  ##  - :rate - the rate per second at which clients should be started.
+  post "/api/clients" do
     clients = Map.get(conn.private, :clients)
-    Grog.start clients, 1000, 10
-    send_resp(conn, 200, "{'status':'started'}")
+    {:ok, body, conn} = read_body(conn)
+    IO.inspect(body)
+    %{count: count, rate: rate} = ExEdn.decode!(body)
+
+    result = Grog.start clients, count, rate
+    send_resp(conn, 200, ExEdn.encode!(%{result: result}))
+  end
+
+  delete "/api/clients" do
+    Grog.stop
+    send_resp(conn, 204, "")
   end
 
   match _ do

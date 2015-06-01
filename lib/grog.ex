@@ -2,8 +2,14 @@ defmodule Grog do
   require Logger
 
   def start(client, n, rate \\ 1) do
-    Logger.info "Starting #{inspect n} #{inspect client}(s) at #{inspect rate} clients/sec"
-    Grog.Client.Server.start(client, n, rate)
+    result = Grog.Client.Server.start(client, n, rate)
+    case result do
+      :ok ->
+        Logger.info "Starting #{inspect n} #{inspect client}(s) at #{inspect rate} clients/sec"
+      :busy ->
+        Logger.info "Busy starting other clients."
+    end
+    result
   end
 
   def stop do
@@ -16,7 +22,7 @@ defmodule Grog do
   end
 
   def status do
-    %{clients_count: Grog.Client.Supervisor.count,
+    %{count: Grog.Client.Supervisor.count,
       metrics: Grog.Metric.Server.get_all}
   end
 end
