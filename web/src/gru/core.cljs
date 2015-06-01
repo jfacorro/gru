@@ -8,7 +8,22 @@
 (defonce app-state (atom {:status :stopped,
                           :count nil
                           :rate nil
-                          :metrics []}))
+                          :metrics [{:type "GET"
+                                     :name "/status"},
+                                    {:type "POST"
+                                     :name "/token"}]
+                          :total nil}))
+
+(def metrics-keys [:type
+                   :name
+                   :num-reqs
+                   :num-fails
+                   :median
+                   :average
+                   :min
+                   :max
+                   :content-size
+                   :reqs-sec])
 
 (defn log [x]
   (.log js/console x))
@@ -35,14 +50,14 @@
                 #(merge % {:status :running
                            :count 1000
                            :rate 10
-                           :metrics {:total {:reqs-sec 10}}})))
+                           :metrics []
+                           :total {:reqs-sec 10}})))
 
 (defn stop [data _]
   (om/transact! data
                 #(merge % {:status :stopped
                            :count nil
-                           :rate nil
-                           :metrics []})))
+                           :rate nil})))
 
 (defn start-button [data owner]
   (dom/button #js {:className "btn btn-success"
@@ -60,6 +75,21 @@
      :stopped (start-button data owner)
      :running (stop-button data owner))))
 
+(defn col-view [data owner]
+  (om/component (dom/td nil data)))
+
+(defn row-view [data owner]
+  (om/component
+   (let [values (mapv #(get data %) metrics-keys)]
+     (println values)
+     (apply dom/tr nil
+            (om/build-all col-view values)))))
+
+(defn table-view [data owner]
+  (om/component
+   (apply dom/tbody nil
+          (om/build-all row-view (:metrics data)))))
+
 (om/root status
          app-state
          {:target (dommy/sel1 :#status)})
@@ -68,10 +98,14 @@
          app-state
          {:target (dommy/sel1 :#minion-count)})
 
-(om/root (partial number-view [:metrics :total :reqs-sec])
+(om/root (partial number-view [:total :reqs-sec])
          app-state
          {:target (dommy/sel1 :#reqs-sec)})
 
 (om/root start-stop
          app-state
          {:target (dommy/sel1 :#start-stop)})
+
+(om/root table-view
+         app-state
+         {:target (dommy/sel1 :#metrics)})

@@ -49,3 +49,11 @@ table tr {
     background-color: transparent;
     color: #FFF;
 }
+
+table tfoot {
+    background-color: #23303E
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: #23303E
+}
