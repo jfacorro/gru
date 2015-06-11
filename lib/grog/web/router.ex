@@ -30,7 +30,6 @@ defmodule Grog.Web.Router do
   post "/api/clients" do
     clients = Map.get(conn.private, :clients)
     {:ok, body, conn} = read_body(conn)
-    IO.inspect(body)
     %{count: count, rate: rate} = ExEdn.decode!(body)
 
     result = Grog.start clients, count, rate

@@ -46,11 +46,11 @@
 
 ;; Start & Stop
 
-(defn start [data _]
-  (POST "/api/clients" {:format :edn
-                        :params {:count 10 :rate 1}
-                        :handler (fn [resp] (log resp))})
+(defn error-handler [{:keys [status status-text]}]
+  (js/alert (str "Oops! There was an ERROR: " status " " status-text)))
 
+(defn start-success [data resp]
+  (log resp)
   (om/transact! data
                 #(merge % {:status :running
                            :count 1000
@@ -58,12 +58,23 @@
                            :metrics []
                            :total {:reqs-sec 10}})))
 
-(defn stop [data _]
+(defn start [data _]
+  (POST "/api/clients"
+        {:format :edn
+         :params {:count 10 :rate 1}
+         :handler (partial start-success data)
+         :error-handler error-handler}))
+
+(defn stop-success [data resp]
+  (log resp)
   (om/transact! data #(merge % {:status :stopped})))
 
-(defn start-button [data owner]
-  (DELETE "/api/clients")
+(defn stop [data _]
+  (DELETE "/api/clients"
+          {:handler (partial stop-success data)
+           :error-handler error-handler}))
 
+(defn start-button [data owner]
   (dom/button #js {:className "btn btn-success"
                    :onClick (partial start data)}
               "Start"))
