@@ -1,4 +1,4 @@
-# ExUnit.start()
+ExUnit.start()
 
 defmodule GrogTest.Client.Tasks do
   use Grog.Client.Tasks

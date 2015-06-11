@@ -1,15 +1,20 @@
 defmodule Grog do
   require Logger
 
-  def start(client, n, rate \\ 1) do
-    result = Grog.Client.Server.start(client, n, rate)
+  def start(clients, n, rate \\ 1)
+
+  def start(clients, n, rate) when is_list(clients) do
+    result = Grog.Client.Server.start(clients, n, rate)
     case result do
       :ok ->
-        Logger.info "Starting #{inspect n} #{inspect client}(s) at #{inspect rate} clients/sec"
+        Logger.info "Starting #{inspect n} #{inspect clients}(s) at #{inspect rate} clients/sec"
       :busy ->
         Logger.info "Busy starting other clients."
     end
     result
+  end
+  def start(client, n, rate) when is_atom(client) do
+    start([client], n, rate)
   end
 
   def stop do
