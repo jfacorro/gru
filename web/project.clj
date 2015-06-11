@@ -6,6 +6,7 @@
                  [org.clojure/clojurescript "0.0-2755"]
 
                  [org.omcljs/om "0.8.8"]
+                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [cljs-ajax "0.3.12"]
                  [prismatic/dommy "1.1.0"]]
 

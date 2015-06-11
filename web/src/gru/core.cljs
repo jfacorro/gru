@@ -1,8 +1,10 @@
 (ns gru.core
+  (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [dommy.core :as dommy :refer-macros [sel sel1]]
             [om.core :as om]
             [om.dom :as dom]
-            [ajax.core :refer [GET POST DELETE]]))
+            [ajax.core :refer [GET POST DELETE]]
+            [cljs.core.async :as async]))
 
 (enable-console-print!)
 
@@ -26,6 +28,8 @@
                    :content-size
                    :reqs-sec])
 
+(def status-timeout 1000)
+
 (defn log [x]
   (.log js/console x))
 
@@ -40,7 +44,10 @@
 
 ;; Number View
 
-(defn number-view [keys data _]
+(defn label-view
+  "Creates a label component to display a value whose
+  path in the `app-state' atom is specified by `keys'."
+  [keys data _]
   (om/component
    (dom/label nil (or (get-in data keys) "n/a"))))
 
@@ -49,14 +56,31 @@
 (defn error-handler [{:keys [status status-text]}]
   (js/alert (str "Oops! There was an ERROR: " status " " status-text)))
 
+(defn update-metrics [data response]
+  ;;(log (str response))
+  ;;(log (:count response))
+  (om/transact! data
+                #(merge % response)))
+
+(defn metrics-loop [data out]
+  (go-loop []
+    (let [[value ch] (async/alts! [out (async/timeout status-timeout)])]
+      (when (not= value :end)
+        (GET "/api/status" {:handler (partial update-metrics data)
+                            :response-format :edn})
+        (recur)))))
+
 (defn start-success [data resp]
   (log resp)
-  (om/transact! data
-                #(merge % {:status :running
-                           :count 1000
-                           :rate 10
-                           :metrics []
-                           :total {:reqs-sec 10}})))
+  (let [out (async/chan)]
+    (om/transact! data
+                  #(merge % {:status :running
+                             :status-chan out
+                             :count 0
+                             :rate 10
+                             :metrics []
+                             :total {:reqs-sec 10}}))
+    (metrics-loop data out)))
 
 (defn start [data _]
   (POST "/api/clients"
@@ -67,7 +91,9 @@
 
 (defn stop-success [data resp]
   (log resp)
-  (om/transact! data #(merge % {:status :stopped})))
+  (async/put! (@app-state :status-chan) :end)
+  (om/transact! data #(merge % {:status :stopped
+                                :status-chan nil})))
 
 (defn stop [data _]
   (DELETE "/api/clients"
@@ -98,7 +124,6 @@
 (defn row-view [data owner]
   (om/component
    (let [values (mapv #(get data %) metrics-keys)]
-     (println values)
      (apply dom/tr nil
             (om/build-all col-view values)))))
 
@@ -111,11 +136,11 @@
          app-state
          {:target (dommy/sel1 :#status)})
 
-(om/root (partial number-view [:count])
+(om/root (partial label-view [:count])
          app-state
          {:target (dommy/sel1 :#minion-count)})
 
-(om/root (partial number-view [:total :reqs-sec])
+(om/root (partial label-view [:total :reqs-sec])
          app-state
          {:target (dommy/sel1 :#reqs-sec)})
 
