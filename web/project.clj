@@ -6,6 +6,7 @@
                  [org.clojure/clojurescript "0.0-2755"]
 
                  [org.omcljs/om "0.8.8"]
+                 [cljs-ajax "0.3.12"]
                  [prismatic/dommy "1.1.0"]]
 
   :node-dependencies [[source-map-support "0.2.8"]]

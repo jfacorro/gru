@@ -1,7 +1,8 @@
 (ns gru.core
   (:require [dommy.core :as dommy :refer-macros [sel sel1]]
             [om.core :as om]
-            [om.dom :as dom]))
+            [om.dom :as dom]
+            [ajax.core :refer [GET POST DELETE]]))
 
 (enable-console-print!)
 
@@ -46,6 +47,10 @@
 ;; Start & Stop
 
 (defn start [data _]
+  (POST "/api/clients" {:format :edn
+                        :params {:count 10 :rate 1}
+                        :handler (fn [resp] (log resp))})
+
   (om/transact! data
                 #(merge % {:status :running
                            :count 1000
@@ -57,6 +62,8 @@
   (om/transact! data #(merge % {:status :stopped})))
 
 (defn start-button [data owner]
+  (DELETE "/api/clients")
+
   (dom/button #js {:className "btn btn-success"
                    :onClick (partial start data)}
               "Start"))
