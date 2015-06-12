@@ -11,6 +11,7 @@ defmodule Grog.HTTP do
   alias Grog.Metric.Percentiles
 
   @timeout :infinity
+  @opts %{report: true}
 
   def open(host, port) do
     {:ok, conn} = :shotgun.open(String.to_char_list(host), port)
@@ -21,44 +22,45 @@ defmodule Grog.HTTP do
     :shotgun.close(conn)
   end
 
-  def get(conn, path, headers \\ %{}, opts \\ %{}) do
+  def get(conn, path, headers \\ %{}, opts \\ @opts) do
     request(conn, :get, path, "", headers, opts)
   end
 
-  def post(conn, path, body, headers \\ %{}, opts \\ %{}) do
+  def post(conn, path, body, headers \\ %{}, opts \\ @opts) do
     request(conn, :post, path, body, headers, opts)
   end
 
-  def delete(conn, path, body, headers \\ %{}, opts \\ %{}) do
+  def delete(conn, path, body, headers \\ %{}, opts \\ @opts) do
     request(conn, :delete, path, body, headers, opts)
   end
 
-  def put(conn, path, body, headers \\ %{}, opts \\ %{}) do
+  def put(conn, path, body, headers \\ %{}, opts \\ @opts) do
     request(conn, :put, path, body, headers, opts)
   end
 
-  def options(conn, path, body, headers \\ %{}, opts \\ %{}) do
+  def options(conn, path, body, headers \\ %{}, opts \\ @opts) do
     request(conn, :options, path, body, headers, opts)
   end
 
-  def head(conn, path, body, headers \\ %{}, opts \\ %{}) do
+  def head(conn, path, body, headers \\ %{}, opts \\ @opts) do
     request(conn, :head, path, body, headers, opts)
   end
 
-  def request(conn, method, path, body, headers \\ %{}, opts \\ %{}) do
+  def request(conn, method, path, body, headers \\ %{}, opts \\ @opts) do
     path_str = String.to_char_list(path)
     opts = Map.put(opts, :timeout, @timeout)
     {time, value} = Utils.time(:shotgun.request(conn, method, path_str, headers, body, opts))
+    if opts[:report] do
+      report_general(time)
 
-    report_general(time)
-
-    case value do
-      {:ok, %{status_code: status_code}} when status_code < 400 ->
-        report_success(opts[:name] || path, time)
-      {:ok, %{status_code: status_code}} ->
-        report_error(opts[:name] || path, status_code)
-      {:error, reason} ->
-        report_error(:error, reason)
+      case value do
+        {:ok, %{status_code: status_code}} when status_code < 400 ->
+          report_success(opts[:name] || path, time)
+        {:ok, %{status_code: status_code}} ->
+          report_error(opts[:name] || path, status_code)
+        {:error, reason} ->
+          report_error(:error, reason)
+      end
     end
 
     value
