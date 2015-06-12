@@ -1,0 +1,59 @@
+body {
+    background-color: #2C4A6A;
+}
+
+nav {
+    background-color: #23303E !important;
+    border: none;
+    color: #FFF;
+}
+
+nav .logo {
+    float: left;
+    width: 45px;
+    margin: 2.5px 0px;
+}
+
+#controls {
+    float: right;
+    height: 50px;
+}
+
+#controls button {
+    margin: 8px 0px;
+}
+
+#controls .info {
+    display: inline-block;
+    width: 100px;
+    text-align: center;
+}
+
+#status {
+    margin-right: 5px;
+}
+
+#start-stop {
+    display: inline-block;
+}
+
+.main {
+    margin-top: 60px;
+}
+
+table {
+    width: 100%;
+}
+
+table tr {
+    background-color: transparent;
+    color: #FFF;
+}
+
+table tfoot {
+    background-color: #23303E
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: #23303E
+}

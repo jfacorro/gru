@@ -1,0 +1,68 @@
+<html>
+  <head>
+    <title>gru</title>
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
+
+    <link rel="icon" href="img/favicon.ico">
+  </head>
+  <body>
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-fixed-top">
+      <div class="container">
+        <img src="img/logo.png" class="logo" />
+
+        <div id="controls">
+          <div class="info">
+            <label id="minion-count">0</label> Minions
+          </div>
+          <div class="info">
+            <label id="reqs-sec">0</label> Reqs/sec
+          </div>
+          <div class="info">
+            <label id="status">[Stopped]</label>
+          </div>
+          <div id="start-stop"></div>
+        </div>
+      </div>
+    </nav>
+    <div class="container main">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <td>Type</td>
+            <td>Name</td>
+            <td># reqs.</td>
+            <td># fails</td>
+            <td>Median</td>
+            <td>Avg.</td>
+            <td>Min</td>
+            <td>Max</td>
+            <td>Content Size</td>
+            <td># reqs./sec</td>
+          </tr>
+        </thead>
+        <tbody id="metrics">
+        </tbody>
+        <tfoot>
+          <tr>
+            <td></td>
+            <td>Total</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/gru.js" type="text/javascript"></script>
+  </body>
+</html>

@@ -37,11 +37,9 @@ defmodule Grog.HdrHistogram do
   end
 
   def new(lowest, highest, digits \\ 3) do
-    assert(lowest >= 1, "lowest (discernible value) must be >= 1")
-    assert(highest >= 2 * lowest,
-           "highest (trackable value) must be >= 2 * lowest (discernible value)")
-    assert(digits >= 0 and digits <= 5,
-           "(number of significant) digits must be between 0 and 5")
+    assert(lowest >= 1, ArgumentError)
+    assert(highest >= 2 * lowest, ArgumentError)
+    assert(digits >= 0 and digits <= 5, ArgumentError)
 
     hist = %HdrHistogram{highest: highest, lowest: lowest, digits: digits}
     init(hist)
@@ -109,8 +107,8 @@ defmodule Grog.HdrHistogram do
   end
 
   defp determine_array_length(hist) do
-    assert(hist.highest >= 2 * hist.lowest,
-              "highest (trackable value) must be >= 2 * lowest (discernible value)")
+    assert(hist.highest >= 2 * hist.lowest, ArgumentError)
+
     hist
     |> buckets_needed_to_cover_value
     |> length_for_bucket_count
@@ -162,19 +160,17 @@ defmodule Grog.HdrHistogram do
   ## Calculate counts_index
 
   defp counts_index(hist, value) do
-    assert(value >= 0, "Histogram recorded value cannot be negative.")
+    assert(value >= 0, ArgumentError)
+
     index = bucket_index(hist, value)
     sub_index = sub_bucket_index(hist, value, index)
     counts_index(hist, index, sub_index)
   end
 
   defp counts_index(hist, index, sub_index) do
-    # IO.inspect([sub_index, hist.sub_bucket_count])
-    assert(sub_index < hist.sub_bucket_count,
-           "Error: sub_index < hist.sub_bucket_count")
-    # IO.inspect([index, sub_index, hist.sub_bucket_half_count])
-    assert(index == 0 or sub_index >= hist.sub_bucket_half_count,
-           "Error: index == 0 or sub_index >= hist.sub_bucket_half_count")
+    assert(sub_index < hist.sub_bucket_count, ArgumentError)
+    assert(index == 0 or sub_index >= hist.sub_bucket_half_count, ArgumentError)
+
     bucket_base_index = :erlang.bsl(index + 1, hist.sub_bucket_half_count_magnitude)
     offset_in_bucket = sub_index - hist.sub_bucket_half_count
     bucket_base_index + offset_in_bucket
