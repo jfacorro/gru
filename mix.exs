@@ -32,6 +32,9 @@ defmodule Grog.Mixfile do
      {:plug, "~> 0.12.2"},
      {:shotgun, github: "inaka/shotgun", tag: "master"},
      {:ex_edn, github: "jfacorro/ExEdn", tag: "0.1.1"},
+     # Override these two deps because they conflict between cowboy and gun.
+     {:cowlib, "~> 1.0.0", override: true},
+     {:ranch, "~> 1.0.0", override: true},
 
      {:exreloader, github: "jfacorro/exreloader", tag: "master", only: :dev},
      {:eep, github: "virtan/eep", tag: "v1.1", only: :dev},
