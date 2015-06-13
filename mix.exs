@@ -31,7 +31,7 @@ defmodule Grog.Mixfile do
     [{:cowboy, github: "ninenines/cowboy", tag: "1.0.1", override: true},
      {:plug, "~> 0.12.2"},
      {:shotgun, github: "inaka/shotgun", tag: "master"},
-     {:ex_edn, github: "jfacorro/ExEdn", tag: "0.1.1"},
+     {:eden, "~> 0.1.2"},
      # Override these two deps because they conflict between cowboy and gun.
      {:cowlib, "~> 1.0.0", override: true},
      {:ranch, "~> 1.0.0", override: true},

@@ -27,7 +27,8 @@ defmodule Grog do
   end
 
   def status do
-    %{count: Grog.Client.Supervisor.count,
+    %{status: Grog.Client.Server.status,
+      count: Grog.Client.Supervisor.count,
       metrics: Grog.Metric.Server.get_all}
   end
 end

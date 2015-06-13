@@ -20,7 +20,8 @@ defmodule Grog.Web.Router do
   static "/img/*_"
 
   get "/api/status" do
-    send_resp(conn, 200, ExEdn.encode!(Grog.status))
+    status = Grog.status
+    send_resp(conn, 200, ExEdn.encode!(status))
   end
 
   ## POST /api/clients

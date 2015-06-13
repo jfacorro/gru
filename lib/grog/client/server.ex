@@ -11,6 +11,10 @@ defmodule Grog.Client.Server do
     {:stopping, Grog.Client.Supervisor.count}
   end
 
+  def status do
+    GenServer.call(__MODULE__, :status)
+  end
+
   ## GenServer
 
   def start_link do
@@ -22,9 +26,13 @@ defmodule Grog.Client.Server do
     {:reply, :ok, state, 0}
   end
   def handle_call({:start, _, _, _}, _from, state) do
-    diff = :timer.now_diff(:os.timestamp, state.now)
-    timeout = round(1000 - diff / 1000)
-    {:reply, :busy, state, timeout}
+    reply_with_timeout(state, :busy)
+  end
+  def handle_call(:status, _from, nil) do
+    {:reply, :stopped, nil}
+  end
+  def handle_call(:status, _from, state) do
+    reply_with_timeout(state, :running)
   end
 
   def handle_cast(:stop, _state) do
@@ -57,5 +65,11 @@ defmodule Grog.Client.Server do
     |> Enum.flat_map(f)
     |> Enum.take(n)
     |> Enum.shuffle
+  end
+
+  defp reply_with_timeout(state, reply) do
+    diff = :timer.now_diff(:os.timestamp, state.now)
+    timeout = round(1000 - diff / 1000)
+    {:reply, reply, state, timeout}
   end
 end
