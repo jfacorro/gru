@@ -21,7 +21,7 @@ defmodule Grog.Web.Router do
 
   get "/api/status" do
     status = Grog.status
-    send_resp(conn, 200, ExEdn.encode!(status))
+    send_resp(conn, 200, Eden.encode!(status))
   end
 
   ## POST /api/clients
@@ -31,10 +31,10 @@ defmodule Grog.Web.Router do
   post "/api/clients" do
     clients = Map.get(conn.private, :clients)
     {:ok, body, conn} = read_body(conn)
-    %{count: count, rate: rate} = ExEdn.decode!(body)
+    %{count: count, rate: rate} = Eden.decode!(body)
 
     result = Grog.start clients, count, rate
-    send_resp(conn, 200, ExEdn.encode!(%{result: result}))
+    send_resp(conn, 200, Eden.encode!(%{result: result}))
   end
 
   delete "/api/clients" do

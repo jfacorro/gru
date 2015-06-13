@@ -29,7 +29,7 @@ defmodule Grog.WebTest do
                                     %{}, %{report: false})
     %{count: count,
       metrics: metrics,
-      status: status} = ExEdn.decode!(body)
+      status: status} = Eden.decode!(body)
     assert is_integer(count)
     assert is_list(metrics)
     assert status == :stopped
@@ -40,21 +40,21 @@ defmodule Grog.WebTest do
   test "POST /api/clients, DELETE /api/clients" do
     conn = HTTP.open("localhost", 8080)
     data = %{count: 10, rate: 10}
-    req_body = ExEdn.encode!(data)
+    req_body = Eden.encode!(data)
 
     {:ok, %{status_code: 200, body: body}} =
       HTTP.post(conn, "/api/clients", req_body, %{}, %{report: false})
-    assert %{result: :ok} = ExEdn.decode!(body)
+    assert %{result: :ok} = Eden.decode!(body)
 
     {:ok, %{body: body}} =
       HTTP.get(conn, "/api/status", %{}, %{report: false})
-    %{status: :running} = ExEdn.decode!(body)
+    %{status: :running} = Eden.decode!(body)
 
     {:ok, %{status_code: 204}} =
       HTTP.delete(conn, "/api/clients", "", %{}, %{report: false})
     {:ok, %{body: body}} =
       HTTP.get(conn, "/api/status", %{}, %{report: false})
-    %{status: :stopped} = ExEdn.decode!(body)
+    %{status: :stopped} = Eden.decode!(body)
 
     HTTP.close(conn)
   end

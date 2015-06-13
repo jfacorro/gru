@@ -16,6 +16,8 @@ defmodule Grog.Metric.Server do
 
     metrics = Map.put(metrics, metric_type, metric)
     insert(@datastore, name, metrics)
+
+    :ok
   end
 
   def get(name) do
