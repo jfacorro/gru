@@ -48,7 +48,11 @@ defmodule Grog.WebTest do
 
     {:ok, %{body: body}} =
       HTTP.get(conn, "/api/status", %{}, %{report: false})
-    %{status: :running} = Eden.decode!(body)
+    %{status: :running,
+      metrics: metrics} = Eden.decode!(body)
+
+    :timer.sleep(1000)
+    assert Map.keys(metrics) == [%{name: "Test", method: "GET"}]
 
     {:ok, %{status_code: 204}} =
       HTTP.delete(conn, "/api/clients", "", %{}, %{report: false})

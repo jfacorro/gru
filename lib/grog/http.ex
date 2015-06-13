@@ -49,10 +49,13 @@ defmodule Grog.HTTP do
   def request(conn, method, path, body, headers \\ %{}, opts \\ @opts) do
     path_str = String.to_char_list(path)
     opts = Map.put(opts, :timeout, @timeout)
-    {time, value} = Utils.time(:shotgun.request(conn, method, path_str, headers, body, opts))
+    {time, value} = Utils.time(:shotgun.request(conn, method, path_str,
+                                                headers, body, opts))
+
     if opts[:report] do
       report_general(time)
-      key = opts[:name] || path
+      key = %{name: opts[:name] || path,
+              method: method}
       case value do
         {:ok, %{status_code: status_code}} when status_code < 400 ->
           report_success(key, time)
@@ -69,7 +72,7 @@ defmodule Grog.HTTP do
   ## Internal
 
   defp report_general(time_us) do
-    key = "Total"
+    key = %{name: "Total"}
     Metric.report(key, %Count{name: "# Requests"}, 1)
     Metric.report(key, %CountInterval{name: "# Reqs/sec", interval: 1000}, 1)
     Metric.report(key, %Percentiles{name: "Percentiles"}, time_us)
