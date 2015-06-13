@@ -31,7 +31,7 @@ defmodule Grog.WebTest do
       metrics: metrics,
       status: status} = Eden.decode!(body)
     assert is_integer(count)
-    assert is_list(metrics)
+    assert is_map(metrics)
     assert status == :stopped
 
     HTTP.close(conn)

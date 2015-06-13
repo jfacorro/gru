@@ -6,22 +6,21 @@ defmodule Grog.Metric.Server do
 
   ## API
 
-  def report(metric, value) do
-    name = Metric.name(metric)
-    metrics = lookup(@datastore, name) || %{}
+  @spec report(any, Metric.t, any) :: :ok
+  def report(key, metric, value) do
+    metrics = lookup(@datastore, key) || %{}
 
-    metric_type = metric.__struct__
-    metric = Map.get(metrics, metric_type, metric)
+    name = Metric.name(metric)
+    metric = Map.get(metrics, name, metric)
     metric = Metric.accumulate(metric, value)
 
-    metrics = Map.put(metrics, metric_type, metric)
-    insert(@datastore, name, metrics)
-
+    metrics = Map.put(metrics, name, metric)
+    insert(@datastore, key, metrics)
     :ok
   end
 
-  def get(name) do
-    lookup(@datastore, name)
+  def get(key) do
+    lookup(@datastore, key)
   end
 
   def get_all do
@@ -70,7 +69,7 @@ defmodule Grog.Metric.Server do
 
   defp get_all(ds) do
     :ets.tab2list(ds)
-    |> Enum.map(fn {_, metric} -> metric end)
+    |> :maps.from_list
   end
 
   defp delete_all(ds) do

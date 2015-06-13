@@ -28,10 +28,10 @@ defmodule GrogTest do
     Grog.start(GrogTest.Client, 100, 1000)
     :timer.sleep(500)
     assert(Grog.status.count == 100)
-    assert(length(Grog.status.metrics) != 0)
+    assert(Map.keys(Grog.status.metrics) != [])
     Grog.stop
-    assert(length(Grog.status.metrics) != 0)
+    assert(Map.keys(Grog.status.metrics) != [])
     Grog.clear
-    assert(length(Grog.status.metrics) == 0)
+    assert(Map.keys(Grog.status.metrics) == [])
   end
 end
