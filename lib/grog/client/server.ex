@@ -59,7 +59,7 @@ defmodule Grog.Client.Server do
   end
 
   def new_state() do
-    %{status: :running, clients: [], n: 0, rate: nil, now: nil}
+    %{status: :stopped, clients: [], n: 0, rate: nil, now: nil}
   end
 
   ## Internal

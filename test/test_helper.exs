@@ -4,11 +4,13 @@ defmodule GrogTest.Client.Tasks do
   use Grog.Client.Tasks
   alias Grog.Metric.Server
   alias Grog.Metric.Count
+  alias Grog.Metric.CountInterval
 
   @weight 100
   deftask get_status(data) do
     key = %{name: "Test", type: "GET"}
-    Server.report(key, %Count{id: :num_reqs, description: "Test"}, 1)
+    Server.report(key, %Count{id: :num_reqs}, 1)
+    Server.report(key, %CountInterval{id: :reqs_sec}, 1)
     data
   end
 end
