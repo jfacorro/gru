@@ -31,7 +31,7 @@ defmodule Grog.WebTest do
       metrics: metrics,
       status: status} = Eden.decode!(body)
     assert is_integer(count)
-    assert is_map(metrics)
+    assert is_list(metrics)
     assert status == :stopped
 
     HTTP.close(conn)
@@ -51,7 +51,7 @@ defmodule Grog.WebTest do
     %{status: :running,
       metrics: metrics} = Eden.decode!(body)
 
-    assert Map.keys(metrics) == [%{name: "Test", method: "GET"}]
+    assert length(metrics) == 1
 
     {:ok, %{status_code: 204}} =
       HTTP.delete(conn, "/api/clients", "", %{}, %{report: false})
