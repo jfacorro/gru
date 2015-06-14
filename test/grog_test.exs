@@ -25,7 +25,7 @@ defmodule GrogTest do
   end
 
   test "Start clients check status, then clear" do
-    Grog.start(GrogTest.Client, 100, 1000)
+    Grog.start(GrogTest.Client2, 100, 1000)
     :timer.sleep(1000)
     assert(Grog.status.count == 100)
     assert(Map.keys(Grog.status.metrics) != [])

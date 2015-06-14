@@ -3,7 +3,7 @@ defmodule Grog.WebTest do
   alias Grog.HTTP
 
   setup_all do
-    Grog.Web.start [GrogTest.Client], 8080, "web"
+    Grog.Web.start [GrogTest.Client2], 8080, "web"
     :ok
   end
 
@@ -51,7 +51,6 @@ defmodule Grog.WebTest do
     %{status: :running,
       metrics: metrics} = Eden.decode!(body)
 
-    :timer.sleep(1000)
     assert Map.keys(metrics) == [%{name: "Test", method: "GET"}]
 
     {:ok, %{status_code: 204}} =

@@ -21,6 +21,6 @@ end
 
 defmodule GrogTest.Client2 do
   use Grog.Client, name: "Test Client 2",
-  min_wait: 500, max_wait: 1000, weight: 5,
+  min_wait: 0, max_wait: 1, weight: 5,
   tasks_module: GrogTest.Client.Tasks
 end
