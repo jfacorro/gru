@@ -7,8 +7,8 @@ defmodule GrogTest.Client.Tasks do
 
   @weight 100
   deftask get_status(data) do
-    key = %{name: "Test", method: "GET"}
-    Server.report(key, %Count{name: "Test"}, 1)
+    key = %{name: "Test", type: "GET"}
+    Server.report(key, %Count{id: :num_reqs, description: "Test"}, 1)
     data
   end
 end

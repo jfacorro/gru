@@ -1,6 +1,7 @@
 defmodule Grog.Web.Router do
   use Plug.Router
   import Grog.Web.Utils
+  alias Grog.Metric
   plug :match
   plug :dispatch
 
@@ -20,7 +21,13 @@ defmodule Grog.Web.Router do
   static "/img/*_"
 
   get "/api/status" do
-    status = Grog.status
+    status = %{metrics: metrics} = Grog.status
+    metrics = for {key, metrics_local} <- metrics, into: [] do
+      for {id, metric} <- metrics_local, into: key do
+        {id, Metric.value(metric)}
+      end
+    end
+    status = %{status | metrics: metrics}
     send_resp(conn, 200, Eden.encode!(status))
   end
 

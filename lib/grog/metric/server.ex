@@ -9,12 +9,9 @@ defmodule Grog.Metric.Server do
   @spec report(any, Metric.t, any) :: :ok
   def report(key, metric, value) do
     metrics = lookup(@datastore, key) || %{}
-
-    name = Metric.name(metric)
-    metric = Map.get(metrics, name, metric)
-    metric = Metric.accumulate(metric, value)
-
-    metrics = Map.put(metrics, name, metric)
+    id = Metric.id(metric)
+    metrics = update_in(metrics, [id],
+                        &Metric.accumulate(&1 || metric, value))
     insert(@datastore, key, metrics)
     :ok
   end

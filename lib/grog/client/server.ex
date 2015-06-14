@@ -18,31 +18,34 @@ defmodule Grog.Client.Server do
   ## GenServer
 
   def start_link do
-    GenServer.start_link(__MODULE__, nil, [name: __MODULE__])
+    GenServer.start_link(__MODULE__, new_state, [name: __MODULE__])
   end
 
-  def handle_call({:start, clients, n, rate}, _from, nil) do
-    state = %{clients: clients, n: n, rate: rate, now: nil}
+  def handle_call({:start, clients, n, rate}, _from, %{status: :stopped}) do
+    state = %{status: :running, clients: clients,
+              n: n, rate: rate, now: nil}
     {:reply, :ok, state, 0}
   end
-  def handle_call({:start, _, _, _}, _from, state) do
+  def handle_call({:start, _, _, _}, _from, %{status: :running} = state) do
     reply_with_timeout(state, :busy)
   end
-  def handle_call(:status, _from, nil) do
-    {:reply, :stopped, nil}
+  def handle_call(:status, _from, %{n: 0} = state) do
+    {:reply, state.status, state}
   end
   def handle_call(:status, _from, state) do
-    reply_with_timeout(state, :running)
+    reply_with_timeout(state, state.status)
   end
 
-  def handle_cast(:stop, _state) do
+  def handle_cast(:stop, state) do
     Grog.Client.Supervisor.children
     |> Enum.map(&Grog.Client.Supervisor.stop_child/1)
-    {:noreply, nil}
+
+    state = %{state | status: :stopped}
+    {:noreply, state}
   end
 
-  def handle_info(:timeout, %{n: 0}) do
-    {:noreply, nil}
+  def handle_info(:timeout, %{n: 0} = state) do
+    {:noreply, state}
   end
   def handle_info(:timeout, state) do
     state.clients
@@ -53,6 +56,10 @@ defmodule Grog.Client.Server do
               | n: max(0, state.n - state.rate),
                 now: :os.timestamp()}
     {:noreply, state, 1000}
+  end
+
+  def new_state() do
+    %{status: :running, clients: [], n: 0, rate: nil, now: nil}
   end
 
   ## Internal
