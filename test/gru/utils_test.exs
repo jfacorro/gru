@@ -1,7 +1,7 @@
-defmodule Grog.UtilsTest do
+defmodule Gru.UtilsTest do
   use ExUnit.Case
-  alias Grog.Utils
-  require Grog.Utils
+  alias Gru.Utils
+  require Gru.Utils
 
   test "repeat/1" do
     stream = Utils.repeat(1)

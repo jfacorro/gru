@@ -1,10 +1,10 @@
-defmodule Grog.WebTest do
+defmodule Gru.WebTest do
   use ExUnit.Case
-  alias Grog.HTTP
+  alias Gru.HTTP
 
   setup_all do
-    Grog.Web.start [GrogTest.ClientWeb], 8080, "web"
-    Grog.clear
+    Gru.Web.start [GruTest.MinionWeb], 8080, "web"
+    Gru.clear
     :ok
   end
 
@@ -38,14 +38,14 @@ defmodule Grog.WebTest do
     HTTP.close(conn)
   end
 
-  test "POST /api/clients, DELETE /api/clients" do
+  test "POST /api/minions, DELETE /api/minions" do
     conn = HTTP.open("localhost", 8080)
     data = %{count: 10, rate: 10}
     req_body = Eden.encode!(data)
 
     try do
       {:ok, %{status_code: 200, body: body}} =
-        HTTP.post(conn, "/api/clients", req_body, %{}, %{report: false})
+        HTTP.post(conn, "/api/minions", req_body, %{}, %{report: false})
       assert %{result: :ok} = Eden.decode!(body)
 
       :timer.sleep(500)
@@ -57,7 +57,7 @@ defmodule Grog.WebTest do
       assert length(metrics) == 2
     after
       {:ok, %{status_code: 204}} =
-        HTTP.delete(conn, "/api/clients", "", %{}, %{report: false})
+        HTTP.delete(conn, "/api/minions", "", %{}, %{report: false})
       {:ok, %{body: body}} =
         HTTP.get(conn, "/api/status", %{}, %{report: false})
       %{status: :stopping} = Eden.decode!(body)

@@ -1,6 +1,6 @@
-defmodule Grog.Metric.Server do
+defmodule Gru.Metric.Server do
   use GenServer
-  alias Grog.Metric
+  alias Gru.Metric
 
   @datastore __MODULE__
 

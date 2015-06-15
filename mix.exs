@@ -1,8 +1,8 @@
-defmodule Grog.Mixfile do
+defmodule Gru.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :grog,
+    [app: :gru,
      version: "0.0.1",
      elixir: "~> 1.0",
      deps: deps,
@@ -10,8 +10,8 @@ defmodule Grog.Mixfile do
   end
 
   def application do
-    [mod: {Grog.App, []},
-     registered: [Grog.Client.Supervisor],
+    [mod: {Gru.App, []},
+     registered: [Gru.Minion.Supervisor],
      applications: [:logger, :shotgun, :cowboy, :plug]]
   end
 
@@ -31,7 +31,7 @@ defmodule Grog.Mixfile do
   end
 
   def escript do
-    [main_module: Grog.CLI,
-     path: "bin/grog"]
+    [main_module: Gru.CLI,
+     path: "bin/gru"]
   end
 end

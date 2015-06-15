@@ -1,8 +1,8 @@
-defmodule Grog.Metric.Count do
-  alias Grog.Metric.Count
+defmodule Gru.Metric.Count do
+  alias Gru.Metric.Count
   defstruct id: :count, description: "", count: 0
 
-  defimpl Grog.Metric, for: Count do
+  defimpl Gru.Metric, for: Count do
     def id(metric), do: metric.id
 
     def value(metric), do: metric.count

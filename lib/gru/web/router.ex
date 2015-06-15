@@ -1,16 +1,16 @@
-defmodule Grog.Web.Router do
+defmodule Gru.Web.Router do
   use Plug.Router
-  import Grog.Web.Utils
-  alias Grog.Metric
+  import Gru.Web.Utils
+  alias Gru.Metric
   plug :match
   plug :dispatch
 
-  @root System.get_env("HOME") <> "/.grog"
+  @root System.get_env("HOME") <> "/.gru"
 
   def call(conn, opts) do
     conn
     |> put_private(:root, opts[:root] || @root)
-    |> put_private(:clients, opts[:clients])
+    |> put_private(:minions, opts[:minions])
     |> super(opts)
   end
 
@@ -21,7 +21,7 @@ defmodule Grog.Web.Router do
   static "/img/*_"
 
   get "/api/status" do
-    status = %{metrics: metrics} = Grog.status
+    status = %{metrics: metrics} = Gru.status
     metrics = for {key, metrics_local} <- metrics, into: [] do
       for {id, metric} <- metrics_local, into: key do
         {id, Metric.value(metric)}
@@ -31,17 +31,17 @@ defmodule Grog.Web.Router do
     send_resp(conn, 200, Eden.encode!(status))
   end
 
-  ## POST /api/clients
+  ## POST /api/minions
   ## The body of the request should be a map with two keys:
-  ##  - :count - the total amount of clients to start.
-  ##  - :rate - the rate per second at which clients should be started.
-  post "/api/clients" do
-    clients = Map.get(conn.private, :clients)
+  ##  - :count - the total amount of minions to start.
+  ##  - :rate - the rate per second at which minions should be started.
+  post "/api/minions" do
+    minions = Map.get(conn.private, :minions)
     {:ok, body, conn} = read_body(conn)
     %{count: count, rate: rate} = Eden.decode!(body)
 
     {status_code, body} =
-      case Grog.start(clients, count, rate) do
+      case Gru.start(minions, count, rate) do
         :ok ->
           {200, Eden.encode!(%{result: :ok})}
         {:error, reason} ->
@@ -51,8 +51,8 @@ defmodule Grog.Web.Router do
     send_resp(conn, status_code, body)
   end
 
-  delete "/api/clients" do
-    Grog.stop
+  delete "/api/minions" do
+    Gru.stop
     send_resp(conn, 204, "")
   end
 

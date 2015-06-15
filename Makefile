@@ -1,4 +1,4 @@
-PROJECT=grog
+PROJECT=gru
 
 all: deps app protocols
 

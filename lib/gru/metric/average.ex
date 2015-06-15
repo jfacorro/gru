@@ -1,8 +1,8 @@
-defmodule Grog.Metric.Average do
-  alias Grog.Metric.Average
+defmodule Gru.Metric.Average do
+  alias Gru.Metric.Average
   defstruct id: :average, description: "", count: 0, sum: 0
 
-  defimpl Grog.Metric, for: Average do
+  defimpl Gru.Metric, for: Average do
     def id(metric), do: metric.id
 
     def value(%Average{count: 0}), do: 0

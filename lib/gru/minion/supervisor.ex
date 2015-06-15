@@ -1,4 +1,4 @@
-defmodule Grog.Client.Supervisor do
+defmodule Gru.Minion.Supervisor do
   use Supervisor
 
   ## Supervisor
@@ -8,7 +8,7 @@ defmodule Grog.Client.Supervisor do
   end
 
   def init([]) do
-    children = [worker(Grog.Client, [], shutdown: 5000)]
+    children = [worker(Gru.Minion, [], shutdown: 5000)]
     supervise(children, strategy: :simple_one_for_one)
   end
 
@@ -23,8 +23,8 @@ defmodule Grog.Client.Supervisor do
     |> Enum.map(fn {_, pid, _, _} -> pid end)
   end
 
-  def start_child client do
-    Supervisor.start_child(__MODULE__, [client])
+  def start_child minion do
+    Supervisor.start_child(__MODULE__, [minion])
   end
 
   def stop_child pid do
