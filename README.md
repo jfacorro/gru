@@ -1,6 +1,8 @@
 Grog
 ====
 
+[![Travis](https://img.shields.io/travis/jfacorro/grog.svg?style=flat-square)](https://travis-ci.org/jfacorro/grog)
+
 <img src="http://i.imgur.com/bHp4rBm.jpg" align="right" style="float:right; margin: 30px; box-shadow: 0px 0px 5px #fff;" width="400" />
 
 Grog is an attempt to build a lightweight but scalable load and stress testing tool in Elixir. There are many benefits of using Elixir for this purposes, the main one being it runs on the Erlang VM, which has built-in support for lightweight processes.
