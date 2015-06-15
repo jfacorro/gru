@@ -3,13 +3,14 @@ defmodule Grog do
 
   def start(clients, n, rate \\ 1)
 
+  @spec start([atom], integer, integer) :: :ok | {:error, any}
   def start(clients, n, rate) when is_list(clients) do
     result = Grog.Client.Server.start(clients, n, rate)
     case result do
       :ok ->
         Logger.info "Starting #{inspect n} #{inspect clients}(s) at #{inspect rate} clients/sec"
-      :busy ->
-        Logger.info "Busy starting other clients."
+      {:error, reason} ->
+        Logger.error "Sorry, but we couldn't start any clients: #{inspect reason}"
     end
     result
   end

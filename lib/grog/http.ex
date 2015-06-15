@@ -55,7 +55,7 @@ defmodule Grog.HTTP do
     if opts[:report] do
       report_general(time)
       key = %{name: opts[:name] || path,
-              type: method}
+              type: Atom.to_string(method)}
       case value do
         {:ok, %{status_code: status_code}} when status_code < 400 ->
           report_success(key, time)

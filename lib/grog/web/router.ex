@@ -40,8 +40,15 @@ defmodule Grog.Web.Router do
     {:ok, body, conn} = read_body(conn)
     %{count: count, rate: rate} = Eden.decode!(body)
 
-    result = Grog.start clients, count, rate
-    send_resp(conn, 200, Eden.encode!(%{result: result}))
+    {status_code, body} =
+      case Grog.start(clients, count, rate) do
+        :ok ->
+          {200, Eden.encode!(%{result: :ok})}
+        {:error, reason} ->
+          {400, Eden.encode!(%{result: reason})}
+      end
+
+    send_resp(conn, status_code, body)
   end
 
   delete "/api/clients" do
