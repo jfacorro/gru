@@ -1,6 +1,6 @@
-defmodule Grog.Client.Server do
+defmodule Gru.Client.Server do
   use GenServer
-  alias Grog.Utils
+  alias Gru.Utils
 
   def start(clients, n, rate) when is_list(clients) do
     case GenServer.call(__MODULE__, {:start, clients, n, rate}) do
@@ -11,7 +11,7 @@ defmodule Grog.Client.Server do
 
   def stop do
     GenServer.cast(__MODULE__, :stop)
-    Grog.Client.Supervisor.count
+    Gru.Client.Supervisor.count
   end
 
   def status do
@@ -73,12 +73,12 @@ defmodule Grog.Client.Server do
   defp start_clients(state) do
     state.clients
     |> clients_list(min(state.rate, state.n))
-    |> Enum.map(&Grog.Client.Supervisor.start_child/1)
+    |> Enum.map(&Gru.Client.Supervisor.start_child/1)
   end
 
   defp stop_clients do
-    Grog.Client.Supervisor.children
-    |> Enum.map(&Grog.Client.Supervisor.stop_child/1)
+    Gru.Client.Supervisor.children
+    |> Enum.map(&Gru.Client.Supervisor.stop_child/1)
 
     :all_stopped
   end

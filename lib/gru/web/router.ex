@@ -1,11 +1,11 @@
-defmodule Grog.Web.Router do
+defmodule Gru.Web.Router do
   use Plug.Router
-  import Grog.Web.Utils
-  alias Grog.Metric
+  import Gru.Web.Utils
+  alias Gru.Metric
   plug :match
   plug :dispatch
 
-  @root System.get_env("HOME") <> "/.grog"
+  @root System.get_env("HOME") <> "/.gru"
 
   def call(conn, opts) do
     conn
@@ -21,7 +21,7 @@ defmodule Grog.Web.Router do
   static "/img/*_"
 
   get "/api/status" do
-    status = %{metrics: metrics} = Grog.status
+    status = %{metrics: metrics} = Gru.status
     metrics = for {key, metrics_local} <- metrics, into: [] do
       for {id, metric} <- metrics_local, into: key do
         {id, Metric.value(metric)}
@@ -41,7 +41,7 @@ defmodule Grog.Web.Router do
     %{count: count, rate: rate} = Eden.decode!(body)
 
     {status_code, body} =
-      case Grog.start(clients, count, rate) do
+      case Gru.start(clients, count, rate) do
         :ok ->
           {200, Eden.encode!(%{result: :ok})}
         {:error, reason} ->
@@ -52,7 +52,7 @@ defmodule Grog.Web.Router do
   end
 
   delete "/api/clients" do
-    Grog.stop
+    Gru.stop
     send_resp(conn, 204, "")
   end
 

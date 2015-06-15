@@ -1,4 +1,4 @@
-defmodule Grog.Web.Utils do
+defmodule Gru.Web.Utils do
   require Plug.Router
 
   defmacro static(at, from \\ nil) do

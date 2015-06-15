@@ -1,7 +1,7 @@
-defmodule Grog.HdrHistogram do
-  alias Grog.HdrHistogram
-  import Grog.Utils
-  require Grog.Utils
+defmodule Gru.HdrHistogram do
+  alias Gru.HdrHistogram
+  import Gru.Utils
+  require Gru.Utils
 
   defstruct lowest: nil, highest: nil, digits: nil,
   bucket_count: nil,
@@ -204,7 +204,7 @@ defmodule Grog.HdrHistogram do
   end
 end
 
-defimpl Inspect, for: Grog.HdrHistogram do
+defimpl Inspect, for: Gru.HdrHistogram do
   import Inspect.Algebra
 
   def inspect(histogram, opts) do

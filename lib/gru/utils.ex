@@ -1,4 +1,4 @@
-defmodule Grog.Utils do
+defmodule Gru.Utils do
   @type element :: any
 
   @doc """

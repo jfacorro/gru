@@ -1,11 +1,11 @@
-defmodule Grog.CLI do
+defmodule Gru.CLI do
   require Logger
   @moduledoc """
-  Implements the command line interface code that loads the Grog
+  Implements the command line interface code that loads the Gru
   specification and starts the web server.
   """
 
-  @defaults %{file: "grog_clients.exs",
+  @defaults %{file: "gru_clients.exs",
               count: 100,
               rate: 10}
 
@@ -26,7 +26,7 @@ defmodule Grog.CLI do
   end
 
   defp help do
-    info "Usage: grog [--file <path>] [--count <count>] [--rate <rate>]"
+    info "Usage: gru [--file <path>] [--count <count>] [--rate <rate>]"
   end
 
   defp run(opts) do
@@ -40,7 +40,7 @@ defmodule Grog.CLI do
     clients = Enum.filter(modules, &client?/1)
 
     if Enum.empty? clients do
-      raise ArgumentError, message: "No Grog.Client(s) defined in '#{path}'."
+      raise ArgumentError, message: "No Gru.Client(s) defined in '#{path}'."
     end
 
     count = opts[:count] || @defaults.count
@@ -50,7 +50,7 @@ defmodule Grog.CLI do
 
   defp start(clients, count, rate) do
       info("Starting #{inspect count} #{inspect clients} client(s) at #{inspect rate} clients/sec")
-      Grog.start(clients, count, rate)
+      Gru.start(clients, count, rate)
       menu(clients, count, rate)
   end
 
@@ -58,9 +58,9 @@ defmodule Grog.CLI do
     info("Press 'q' to  quit, 's' to show current status or 'r' to restart: ")
     case String.strip(IO.read(:line)) do
       "s" ->
-        output("#{inspect Grog.status}")
+        output("#{inspect Gru.status}")
       "r" ->
-        Grog.stop
+        Gru.stop
         start(clients, count, rate)
       "q" ->
         info("Bye!")
@@ -86,6 +86,6 @@ defmodule Grog.CLI do
   end
 
   defp client?(module) do
-    [true] == module.__info__(:attributes)[:grog_client]
+    [true] == module.__info__(:attributes)[:gru_client]
   end
 end

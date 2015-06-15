@@ -1,4 +1,4 @@
-defmodule Grog.Client.Supervisor do
+defmodule Gru.Client.Supervisor do
   use Supervisor
 
   ## Supervisor
@@ -8,7 +8,7 @@ defmodule Grog.Client.Supervisor do
   end
 
   def init([]) do
-    children = [worker(Grog.Client, [], shutdown: 5000)]
+    children = [worker(Gru.Client, [], shutdown: 5000)]
     supervise(children, strategy: :simple_one_for_one)
   end
 

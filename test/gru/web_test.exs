@@ -1,10 +1,10 @@
-defmodule Grog.WebTest do
+defmodule Gru.WebTest do
   use ExUnit.Case
-  alias Grog.HTTP
+  alias Gru.HTTP
 
   setup_all do
-    Grog.Web.start [GrogTest.ClientWeb], 8080, "web"
-    Grog.clear
+    Gru.Web.start [GruTest.ClientWeb], 8080, "web"
+    Gru.clear
     :ok
   end
 

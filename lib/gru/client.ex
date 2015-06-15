@@ -1,6 +1,6 @@
-defmodule Grog.Client do
+defmodule Gru.Client do
   use GenServer
-  alias Grog.Utils
+  alias Gru.Utils
 
   ## GenServer
 
@@ -37,8 +37,8 @@ defmodule Grog.Client do
   defmacro __using__(opts) do
     weight = opts[:weight]
     quote do
-      Module.register_attribute(__MODULE__, :grog_client, persist: true)
-      @grog_client true
+      Module.register_attribute(__MODULE__, :gru_client, persist: true)
+      @gru_client true
 
       @default %{min_wait: 1000,
                  max_wait: 5000,

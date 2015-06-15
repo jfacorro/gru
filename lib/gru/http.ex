@@ -1,14 +1,14 @@
-defmodule Grog.HTTP do
+defmodule Gru.HTTP do
   require Logger
-  require Grog.Utils
-  alias Grog.Utils
-  alias Grog.Metric.Server, as: Metric
-  alias Grog.Metric.Count
-  alias Grog.Metric.CountInterval
-  alias Grog.Metric.Average
-  alias Grog.Metric.Min
-  alias Grog.Metric.Max
-  alias Grog.Metric.Percentiles
+  require Gru.Utils
+  alias Gru.Utils
+  alias Gru.Metric.Server, as: Metric
+  alias Gru.Metric.Count
+  alias Gru.Metric.CountInterval
+  alias Gru.Metric.Average
+  alias Gru.Metric.Min
+  alias Gru.Metric.Max
+  alias Gru.Metric.Percentiles
 
   @timeout :infinity
   @opts %{report: true}
