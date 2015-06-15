@@ -3,8 +3,8 @@ defmodule Gru.App do
 
   def start(_type, _args) do
     import Supervisor.Spec
-    children = [worker(Gru.Client.Server, []),
-                supervisor(Gru.Client.Supervisor, []),
+    children = [worker(Gru.Minion.Server, []),
+                supervisor(Gru.Minion.Supervisor, []),
                 worker(Gru.Metric.Server, [])]
     opts = [strategy: :one_for_one,
             name: Gru.Supervisor]

@@ -1,27 +1,23 @@
-Grog
+Gru
 ====
 
 [![Travis](https://img.shields.io/travis/jfacorro/grog.svg?style=flat-square)](https://travis-ci.org/jfacorro/grog)
 
-<img src="http://i.imgur.com/bHp4rBm.jpg" align="right" style="float:right; margin: 30px; box-shadow: 0px 0px 5px #fff;" width="400" />
-
-Grog is an attempt to build a lightweight but scalable load and stress testing tool in Elixir. There are many benefits of using Elixir for this purposes, the main one being it runs on the Erlang VM, which has built-in support for lightweight processes.
-
-The name of the project is a reference to Monkey Island's beverage, we thought it was a cool name and sort of made sense in the context of the language being used (i.e. Elixir).
+Gru is an attempt to build a lightweight but scalable load/stress testing tool. Using Elixir for this purpose has many benefits, the main one being the Erlang VM, which has built-in support for lightweight processes.
 
 # Rationale
 
-After trying some load testing tools, none of them fulfilled two basic needs we had:
+After trying some load testing tools, none of them fulfilled two basic needs:
 
-1. Provide a simple and flexible API to implement the clients logic.
-2. Low CPU and memory consumption, to be able to maximize the number of virtual clients being simulated.
+1. Provide a simple and flexible API to implement the clients (minions) logic.
+2. Low CPU and memory consumption, to be able to maximize the number of minions being simulated.
 
 So we set out to try to build a system with these two main goals in mind.
 
 # Roadmap
 
-1. Create a simple, flexible API to define clients.
-2. Basic spawning mechanism for clients.
+1. Create a simple, flexible API to define minions.
+2. Basic spawning mechanism for minions.
 3. Metrics endpoints.
 4. Web UI.
 5. Distribution.

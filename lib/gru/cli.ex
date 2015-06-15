@@ -5,7 +5,7 @@ defmodule Gru.CLI do
   specification and starts the web server.
   """
 
-  @defaults %{file: "gru_clients.exs",
+  @defaults %{file: "minions.exs",
               count: 100,
               rate: 10}
 
@@ -33,42 +33,42 @@ defmodule Gru.CLI do
     path = opts[:file] || @defaults.file
 
     if not File.exists? path do
-      raise ArgumentError, message: "No clients file found."
+      raise ArgumentError, message: "No minions file found."
     end
 
     modules = Kernel.ParallelCompiler.files([path])
-    clients = Enum.filter(modules, &client?/1)
+    minions = Enum.filter(modules, &minion?/1)
 
-    if Enum.empty? clients do
-      raise ArgumentError, message: "No Gru.Client(s) defined in '#{path}'."
+    if Enum.empty? minions do
+      raise ArgumentError, message: "No Gru.Minion(s) defined in '#{path}'."
     end
 
     count = opts[:count] || @defaults.count
     rate = opts[:rate] || @defaults.rate
-    start(clients, count, rate)
+    start(minions, count, rate)
   end
 
-  defp start(clients, count, rate) do
-      info("Starting #{inspect count} #{inspect clients} client(s) at #{inspect rate} clients/sec")
-      Gru.start(clients, count, rate)
-      menu(clients, count, rate)
+  defp start(minions, count, rate) do
+      info("Starting #{inspect count} #{inspect minions} minion(s) at #{inspect rate} minions/sec")
+      Gru.start(minions, count, rate)
+      menu(minions, count, rate)
   end
 
-  defp menu(clients, count, rate) do
+  defp menu(minions, count, rate) do
     info("Press 'q' to  quit, 's' to show current status or 'r' to restart: ")
     case String.strip(IO.read(:line)) do
       "s" ->
         output("#{inspect Gru.status}")
       "r" ->
         Gru.stop
-        start(clients, count, rate)
+        start(minions, count, rate)
       "q" ->
         info("Bye!")
         :erlang.halt(0)
       _ ->
         error("Invalid option.", false)
     end
-    menu(clients, count, rate)
+    menu(minions, count, rate)
   end
 
   defp output(msg) do
@@ -85,7 +85,7 @@ defmodule Gru.CLI do
     if halt, do: :erlang.halt(1)
   end
 
-  defp client?(module) do
-    [true] == module.__info__(:attributes)[:gru_client]
+  defp minion?(module) do
+    [true] == module.__info__(:attributes)[:minion]
   end
 end

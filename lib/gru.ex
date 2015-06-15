@@ -1,26 +1,26 @@
 defmodule Gru do
   require Logger
 
-  def start(clients, n, rate \\ 1)
+  def start(minions, n, rate \\ 1)
 
   @spec start([atom], integer, integer) :: :ok | {:error, any}
-  def start(clients, n, rate) when is_list(clients) do
-    result = Gru.Client.Server.start(clients, n, rate)
+  def start(minions, n, rate) when is_list(minions) do
+    result = Gru.Minion.Server.start(minions, n, rate)
     case result do
       :ok ->
-        Logger.info "Starting #{inspect n} #{inspect clients}(s) at #{inspect rate} clients/sec"
+        Logger.info "Starting #{inspect n} #{inspect minions}(s) at #{inspect rate} minions/sec"
       {:error, reason} ->
-        Logger.error "Sorry, but we couldn't start any clients: #{inspect reason}"
+        Logger.error "Sorry, but we couldn't start any minions: #{inspect reason}"
     end
     result
   end
-  def start(client, n, rate) when is_atom(client) do
-    start([client], n, rate)
+  def start(minion, n, rate) when is_atom(minion) do
+    start([minion], n, rate)
   end
 
   def stop do
-    Logger.info "Stopping all clients..."
-    Gru.Client.Server.stop()
+    Logger.info "Stopping all minions..."
+    Gru.Minion.Server.stop()
   end
 
   def clear do
@@ -28,8 +28,8 @@ defmodule Gru do
   end
 
   def status do
-    %{status: Gru.Client.Server.status,
-      count: Gru.Client.Supervisor.count,
+    %{status: Gru.Minion.Server.status,
+      count: Gru.Minion.Supervisor.count,
       metrics: Gru.Metric.Server.get_all}
   end
 end

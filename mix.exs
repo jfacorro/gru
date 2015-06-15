@@ -11,7 +11,7 @@ defmodule Gru.Mixfile do
 
   def application do
     [mod: {Gru.App, []},
-     registered: [Gru.Client.Supervisor],
+     registered: [Gru.Minion.Supervisor],
      applications: [:logger, :shotgun, :cowboy, :plug]]
   end
 

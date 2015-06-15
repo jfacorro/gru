@@ -1,4 +1,4 @@
-defmodule Gru.Client.Tasks do
+defmodule Gru.Minion.Tasks do
   alias Gru.Utils
 
   ## __using__ and its functionality
@@ -6,7 +6,7 @@ defmodule Gru.Client.Tasks do
   defmacro __using__(_opts) do
     quote do
       import unquote(__MODULE__), only: [deftask: 2]
-      @before_compile Gru.Client.Tasks
+      @before_compile Gru.Minion.Tasks
       # Accumulate tasks with their weights
       Module.register_attribute(__MODULE__, :tasks, accumulate: true)
     end
@@ -23,7 +23,7 @@ defmodule Gru.Client.Tasks do
 
   defmacro deftask(definition = {name, _, _}, do: contents) do
     quote do
-      Gru.Client.Tasks.__on_definition__(__ENV__, unquote(name))
+      Gru.Minion.Tasks.__on_definition__(__ENV__, unquote(name))
       def unquote(definition), do: unquote(contents)
     end
   end

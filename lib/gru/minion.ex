@@ -1,4 +1,4 @@
-defmodule Gru.Client do
+defmodule Gru.Minion do
   use GenServer
   alias Gru.Utils
 
@@ -11,25 +11,25 @@ defmodule Gru.Client do
   def init([module]) do
     # Let's trap exits so the terminate/2 callback is called
     Process.flag(:trap_exit, true)
-    state = %{client: module.__init__(),
+    state = %{minion: module.__init__(),
               module: module}
     timeout = wait_timeout(state)
     {:ok, state, timeout}
   end
 
   def handle_info(:timeout, state) do
-    tasks = state.client.tasks_module.__tasks__()
+    tasks = state.minion.tasks_module.__tasks__()
     if tasks != [] do
       n = Utils.uniform(length(tasks))
       task_name = Enum.at(tasks, n)
-      apply(state.client.tasks_module, task_name, [state.client])
+      apply(state.minion.tasks_module, task_name, [state.minion])
     end
 
     {:noreply, state, wait_timeout(state)}
   end
 
   def terminate(_reason, state) do
-    state.module.terminate(state.client)
+    state.module.terminate(state.minion)
   end
 
   ## __using__ and its functionality
@@ -37,8 +37,8 @@ defmodule Gru.Client do
   defmacro __using__(opts) do
     weight = opts[:weight]
     quote do
-      Module.register_attribute(__MODULE__, :gru_client, persist: true)
-      @gru_client true
+      Module.register_attribute(__MODULE__, :minion, persist: true)
+      @minion true
 
       @default %{min_wait: 1000,
                  max_wait: 5000,
@@ -65,6 +65,6 @@ defmodule Gru.Client do
   ## Internal functions
 
   defp wait_timeout state do
-    Utils.uniform(state.client.min_wait, state.client.max_wait)
+    Utils.uniform(state.minion.min_wait, state.minion.max_wait)
   end
 end

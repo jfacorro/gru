@@ -15,8 +15,8 @@ defmodule GruTest.Utils do
   end
 end
 
-defmodule GruTest.Client.Tasks do
-  use Gru.Client.Tasks
+defmodule GruTest.Minion.Tasks do
+  use Gru.Minion.Tasks
   alias Gru.Metric.Server
   alias Gru.Metric.Count
   alias Gru.Metric.CountInterval
@@ -34,16 +34,16 @@ defmodule GruTest.Client.Tasks do
   end
 end
 
-defmodule GruTest.Client do
-  use Gru.Client, name: "Test Client",
+defmodule GruTest.Minion do
+  use Gru.Minion, name: "Test Minion",
   min_wait: 500, max_wait: 1000, weight: 10,
-  tasks_module: GruTest.Client.Tasks
+  tasks_module: GruTest.Minion.Tasks
 end
 
-defmodule GruTest.ClientWeb do
-  use Gru.Client, name: "Test Web Client",
+defmodule GruTest.MinionWeb do
+  use Gru.Minion, name: "Test Web Minion",
   min_wait: 0, max_wait: 1, weight: 5,
-  tasks_module: GruTest.Client.Tasks
+  tasks_module: GruTest.Minion.Tasks
 
   def init(data) do
     Map.put(data, :conn, Gru.HTTP.open("localhost", 8080))

@@ -1,9 +1,9 @@
-defmodule Gru.Client.Server do
+defmodule Gru.Minion.Server do
   use GenServer
   alias Gru.Utils
 
-  def start(clients, n, rate) when is_list(clients) do
-    case GenServer.call(__MODULE__, {:start, clients, n, rate}) do
+  def start(minions, n, rate) when is_list(minions) do
+    case GenServer.call(__MODULE__, {:start, minions, n, rate}) do
       :ok -> :ok
       reason -> {:error, reason}
     end
@@ -11,7 +11,7 @@ defmodule Gru.Client.Server do
 
   def stop do
     GenServer.cast(__MODULE__, :stop)
-    Gru.Client.Supervisor.count
+    Gru.Minion.Supervisor.count
   end
 
   def status do
@@ -24,8 +24,8 @@ defmodule Gru.Client.Server do
     GenServer.start_link(__MODULE__, new_state, [name: __MODULE__])
   end
 
-  def handle_call({:start, clients, n, rate}, _from, %{status: :stopped}) do
-    state = %{status: :running, clients: clients,
+  def handle_call({:start, minions, n, rate}, _from, %{status: :stopped}) do
+    state = %{status: :running, minions: minions,
               n: n, rate: rate, now: nil}
     {:reply, :ok, state, 0}
   end
@@ -40,7 +40,7 @@ defmodule Gru.Client.Server do
   end
 
   def handle_cast(:stop, state) do
-    Task.async &stop_clients/0
+    Task.async &stop_minions/0
     state = %{state | status: :stopping}
     {:noreply, state}
   end
@@ -49,7 +49,7 @@ defmodule Gru.Client.Server do
     {:noreply, state}
   end
   def handle_info(:timeout, state) do
-    Task.async fn -> start_clients(state) end
+    Task.async fn -> start_minions(state) end
 
     state = %{state
               | n: max(0, state.n - state.rate),
@@ -67,32 +67,32 @@ defmodule Gru.Client.Server do
   ## Internal
 
   defp new_state() do
-    %{status: :stopped, clients: [], n: 0, rate: nil, now: nil}
+    %{status: :stopped, minions: [], n: 0, rate: nil, now: nil}
   end
 
-  defp start_clients(state) do
-    state.clients
-    |> clients_list(min(state.rate, state.n))
-    |> Enum.map(&Gru.Client.Supervisor.start_child/1)
+  defp start_minions(state) do
+    state.minions
+    |> minions_list(min(state.rate, state.n))
+    |> Enum.map(&Gru.Minion.Supervisor.start_child/1)
   end
 
-  defp stop_clients do
-    Gru.Client.Supervisor.children
-    |> Enum.map(&Gru.Client.Supervisor.stop_child/1)
+  defp stop_minions do
+    Gru.Minion.Supervisor.children
+    |> Enum.map(&Gru.Minion.Supervisor.stop_child/1)
 
     :all_stopped
   end
 
-  defp clients_list(clients, n) do
-    total = Enum.reduce(clients, 0, fn(client, acc) ->
-      acc + client.weight
+  defp minions_list(minions, n) do
+    total = Enum.reduce(minions, 0, fn(minion, acc) ->
+      acc + minion.weight
     end)
 
-    f = fn client ->
-      Utils.repeat(client, Utils.ceil(client.weight / total * n))
+    f = fn minion ->
+      Utils.repeat(minion, Utils.ceil(minion.weight / total * n))
     end
 
-    clients
+    minions
     |> Enum.flat_map(f)
     |> Enum.take(n)
     |> Enum.shuffle
