@@ -11,22 +11,19 @@
 (defonce app-state (atom {:status :stopped,
                           :count nil
                           :rate nil
-                          :metrics [{:type "GET"
-                                     :name "/status"},
-                                    {:type "POST"
-                                     :name "/token"}]
+                          :metrics []
                           :total nil}))
 
 (def metrics-keys [:type
                    :name
-                   :num-reqs
-                   :num-fails
+                   :num_reqs
+                   :num_fails
                    :median
                    :average
                    :min
                    :max
                    :content-size
-                   :reqs-sec])
+                   :reqs_sec])
 
 (def status-timeout 1000)
 

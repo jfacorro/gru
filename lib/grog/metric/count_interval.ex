@@ -1,11 +1,11 @@
 defmodule Grog.Metric.CountInterval do
   alias Grog.Metric.CountInterval
-  defstruct name: "", interval: 1000,
+  defstruct id: :count_interval, description: "", interval: 1000,
             last_now: :erlang.now(), last_count: 0,
             current_count: 0
 
   defimpl Grog.Metric, for: CountInterval do
-    def name(metric), do: metric.name
+    def id(metric), do: metric.id
 
     def value(metric), do: metric.last_count
 

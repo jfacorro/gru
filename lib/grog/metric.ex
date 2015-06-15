@@ -1,5 +1,5 @@
 defprotocol Grog.Metric do
-  def name(metric)
+  def id(metric)
   def value(metric)
   def accumulate(metric, value)
 end

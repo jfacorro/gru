@@ -1,9 +1,9 @@
 defmodule Grog.Metric.Min do
   alias Grog.Metric.Min
-  defstruct name: "", min: nil
+  defstruct id: :min, description: "", min: nil
 
   defimpl Grog.Metric, for: Min do
-    def name(metric), do: metric.name
+    def id(metric), do: metric.id
 
     def value(metric), do: metric.min
 

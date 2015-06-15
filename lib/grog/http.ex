@@ -49,15 +49,18 @@ defmodule Grog.HTTP do
   def request(conn, method, path, body, headers \\ %{}, opts \\ @opts) do
     path_str = String.to_char_list(path)
     opts = Map.put(opts, :timeout, @timeout)
-    {time, value} = Utils.time(:shotgun.request(conn, method, path_str, headers, body, opts))
+    {time, value} = Utils.time(:shotgun.request(conn, method, path_str,
+                                                headers, body, opts))
+
     if opts[:report] do
       report_general(time)
-
+      key = %{name: opts[:name] || path,
+              type: Atom.to_string(method)}
       case value do
         {:ok, %{status_code: status_code}} when status_code < 400 ->
-          report_success(opts[:name] || path, time)
+          report_success(key, time)
         {:ok, %{status_code: status_code}} ->
-          report_error(opts[:name] || path, status_code)
+          report_error(key, status_code)
         {:error, reason} ->
           report_error(:error, reason)
       end
@@ -69,24 +72,24 @@ defmodule Grog.HTTP do
   ## Internal
 
   defp report_general(time_us) do
-    Metric.report(%Count{name: "# Requests"}, 1)
-    Metric.report(%CountInterval{name: "# Reqs/sec", interval: 1000}, 1)
-    Metric.report(%Percentiles{name: "Total"}, time_us)
+    key = %{name: "Total"}
+    Metric.report(key, %Count{id: :num_reqs, description: "# Requests"}, 1)
+    Metric.report(key, %CountInterval{id: :reqs_sec, description: "# Reqs/sec", interval: 1000}, 1)
+    Metric.report(key, %Percentiles{description: "Percentiles"}, time_us)
   end
 
-  defp report_success(name, time_us) do
+  defp report_success(key, time_us) do
     time_ms = time_us / 1000
-    Metric.report(%Count{name: name}, 1)
-    Metric.report(%Average{name: name}, time_ms)
-    Metric.report(%Min{name: name}, time_ms)
-    Metric.report(%Max{name: name}, time_ms)
-    Metric.report(%CountInterval{name: name, interval: 1000}, 1)
+    Metric.report(key, %Count{id: :num_reqs, description: "# Requests"}, 1)
+    Metric.report(key, %Average{id: :average, description: "Average"}, time_ms)
+    Metric.report(key, %Min{id: :min, description: "Min"}, time_ms)
+    Metric.report(key, %Max{id: :max, description: "Max"}, time_ms)
+    Metric.report(key, %CountInterval{id: :reqs_sec, description: "# Reqs/sec", interval: 1000}, 1)
 
-    Metric.report(%Percentiles{name: name}, time_us)
+    Metric.report(key, %Percentiles{description: "Percentiles"}, time_us)
   end
 
-  defp report_error(name, status_code) do
-    id = {name, status_code}
-    Metric.report(%Count{name: id}, 1)
+  defp report_error(key, status_code) do
+    Metric.report(key, %Count{id: :num_fails, description: status_code}, 1)
   end
 end

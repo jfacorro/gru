@@ -27,3 +27,6 @@ shell: app
 
 escript:
 	mix escript.build
+
+tests:
+	mix test --trace
