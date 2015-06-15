@@ -15,9 +15,9 @@ defmodule GrogTest do
     Utils.wait_for(&stopped?/0)
 
     Grog.start(GrogTest.Client, 100, 50)
-    :timer.sleep(1000)
+    :timer.sleep(800)
     assert(Grog.status.count != 100)
-    :timer.sleep(1000)
+    :timer.sleep(1500)
     assert(Grog.status.count == 100)
     Grog.stop
   end
