@@ -1,78 +1,86 @@
 defmodule Gru.Minion.Server do
-  use GenServer
   alias Gru.Utils
+  alias Gru.Utils.GenFSM
+  use GenFSM, initial_state: :stopped
 
   def start(minions, n, rate) when is_list(minions) do
-    case GenServer.call(__MODULE__, {:start, minions, n, rate}) do
+    event = {:start, minions, n, rate}
+    case GenFSM.sync_send_all_state_event(__MODULE__, event) do
       :ok -> :ok
       reason -> {:error, reason}
     end
   end
 
   def stop do
-    GenServer.cast(__MODULE__, :stop)
+    GenFSM.send_all_state_event(__MODULE__, :stop)
     Gru.Minion.Supervisor.count
   end
 
   def status do
-    GenServer.call(__MODULE__, :status)
+    GenFSM.sync_send_all_state_event(__MODULE__, :status)
   end
 
   ## GenServer
 
   def start_link do
-    GenServer.start_link(__MODULE__, new_state, [name: __MODULE__])
+    GenFSM.start_link(__MODULE__, nil, [name: __MODULE__])
   end
 
-  def handle_call({:start, minions, n, rate}, _from, %{status: :stopped}) do
-    state = %{status: :running, minions: minions,
-              n: n, rate: rate, now: nil}
-    {:reply, :ok, state, 0}
-  end
-  def handle_call({:start, _, _, _}, _from, state) do
-    reply_with_timeout(state, state.status)
-  end
-  def handle_call(:status, _from, %{n: 0} = state) do
-    {:reply, state.status, state}
-  end
-  def handle_call(:status, _from, state) do
-    reply_with_timeout(state, state.status)
+  def stopped({:start, minions, n, rate}, _from, _data) do
+    data = %{minions: minions, n: n, rate: rate, now: nil}
+    {:reply, :ok, :starting, data, 0}
   end
 
-  def handle_cast(:stop, state) do
-    Task.async &stop_minions/0
-    state = %{state | status: :stopping}
-    {:noreply, state}
-  end
+  ## Starting
 
-  def handle_info(:timeout, %{n: 0} = state) do
-    {:noreply, state}
+  def starting(:timeout, %{n: 0} = data) do
+    {:next_state, :running, data}
   end
-  def handle_info(:timeout, state) do
-    Task.async fn -> start_minions(state) end
+  def starting(:timeout, data) do
+    Task.async fn -> start_minions(data) end
 
-    state = %{state
-              | n: max(0, state.n - state.rate),
+    data = %{data
+              | n: max(0, data.n - data.rate),
               now: :os.timestamp()}
-    {:noreply, state, 1000}
-  end
-  def handle_info({_, :all_stopped}, state) do
-    state = %{state | status: :stopped, n: 0}
-    {:noreply, state}
-  end
-  def handle_info(_, state) do
-    reply_with_timeout(state, :noreply)
+
+    {:next_state, :starting, data, 1000}
   end
 
+  def handle_event(:stop, _state, data) do
+    Task.async &stop_minions/0
+    {:next_state, :stopping, data}
+  end
+
+  def handle_sync_event(_, _from, state = :starting, data) do
+    remaining = remaining_timeout(data.now)
+    {:reply, state, state, data, remaining}
+  end
+  def handle_sync_event(:status, _from, state, data) do
+    {:reply, state, state, data}
+  end
+  def handle_sync_event(event = {:start, _, _, _}, from, :stopped, data) do
+    stopped(event, from, data)
+  end
+  def handle_sync_event({:start, _, _, _}, _from, state, data) do
+    {:reply, state, state, data}
+  end
+
+  def handle_info({_, :all_stopped}, :stopping, data) do
+    {:next_state, :stopped, data}
+  end
+  def handle_info(_, :starting, data) do
+    remaining = remaining_timeout(data.now)
+    {:next_state, :starting, data, remaining}
+  end
+  def handle_info(_, state, data) do
+    {:next_state, state, data}
+  end
   ## Internal
 
-  defp new_state() do
-    %{status: :stopped, minions: [], n: 0, rate: nil, now: nil}
-  end
-
   defp start_minions(state) do
+    n = min(state.rate, state.n)
     state.minions
-    |> minions_list(min(state.rate, state.n))
+    |> minions_list(n)
     |> Enum.map(&Gru.Minion.Supervisor.start_child/1)
   end
 
@@ -98,18 +106,8 @@ defmodule Gru.Minion.Server do
     |> Enum.shuffle
   end
 
-  defp reply_with_timeout(%{status: :running, n: n} = state, reply) when n > 0 do
-    diff = :timer.now_diff(:os.timestamp, state.now)
-    timeout = round(1000 - diff / 1000)
-    case reply do
-      :noreply -> {:noreply, state, timeout}
-      _ -> {:reply, reply, state, timeout}
-    end
-  end
-  defp reply_with_timeout(state, reply) do
-    case reply do
-      :noreply -> {:noreply, state}
-      _ -> {:reply, reply, state}
-    end
+  defp remaining_timeout(then) do
+    diff = :timer.now_diff(:os.timestamp, then)
+    round(1000 - diff / 1000)
   end
 end
