@@ -89,7 +89,7 @@ defmodule Gru.Minion.Server do
     end)
 
     f = fn minion ->
-      Utils.repeat(minion, Utils.ceil(minion.weight / total * n))
+      Utils.repeat(minion, Float.ceil(minion.weight / total * n))
     end
 
     minions

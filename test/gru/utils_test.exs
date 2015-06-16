@@ -39,19 +39,6 @@ defmodule Gru.UtilsTest do
     assert Enum.all?(nums, fn x -> low <= x and x < high end)
   end
 
-  test "ceil/1" do
-    assert(Utils.ceil(1.5) == 2)
-    assert(Utils.ceil(1.1) == 2)
-    assert(Utils.ceil(1.0) == 1)
-
-    assert(Utils.ceil(10.9) == 11)
-    assert(Utils.ceil(10.999) == 11)
-    assert(Utils.ceil(9.999) == 10)
-
-    assert(Utils.ceil(-9.999) == -9)
-    assert(Utils.ceil(-1.0) == -1)
-  end
-
   test "leading_zeros/1" do
     assert(Utils.leading_zeros(100) == 57)
     assert(Utils.leading_zeros(146754387) == 36)
