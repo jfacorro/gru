@@ -79,7 +79,7 @@ defmodule Gru.HdrHistogram do
 
   defp init(hist) do
     largest_unit_resolution = trunc(2 * :math.pow(10, hist.digits))
-    unit_magnitude = trunc(:math.log(hist.lowest) / :math.log(2));
+    unit_magnitude = trunc(:math.log(hist.lowest) / :math.log(2))
     sub_bucket_count_magnitude = trunc(Float.ceil(:math.log(largest_unit_resolution) / :math.log(2)))
     sub_bucket_half_count_magnitude =
       if sub_bucket_count_magnitude > 1 do
