@@ -51,7 +51,7 @@ defmodule Gru.WebTest do
       :timer.sleep(500)
       {:ok, %{body: body}} =
         HTTP.get(conn, "/api/status", %{}, %{report: false})
-      %{status: :running,
+      %{status: :starting,
         metrics: metrics} = Eden.decode!(body)
 
       assert length(metrics) == 2

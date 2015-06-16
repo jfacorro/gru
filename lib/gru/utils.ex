@@ -68,17 +68,6 @@ defmodule Gru.Utils do
   end
 
   @doc """
-  Return the ceiling of the number provided.
-  """
-  def ceil(n) do
-    x = trunc(n)
-    case n - x > 0 do
-      true -> x + 1
-      false -> x
-    end
-  end
-
-  @doc """
   Returns the  number of leading zeros of the provided integer
   assuming a 64 bit representation.
   """
