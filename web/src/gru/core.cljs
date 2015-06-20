@@ -8,6 +8,9 @@
 
 (enable-console-print!)
 
+(def api-urls {:status "/api/status"
+               :minions "/api/minions"})
+
 (defonce app-state (atom {:status :stopped,
                           :count nil
                           :rate nil
@@ -63,7 +66,7 @@
   (go-loop []
     (let [[value ch] (async/alts! [out (async/timeout status-timeout)])]
       (when (not= value :end)
-        (GET "/api/status" {:handler (partial update-metrics data)
+        (GET (api-urls :status) {:handler (partial update-metrics data)
                             :response-format :edn})
         (recur)))))
 
@@ -80,7 +83,7 @@
     (metrics-loop data out)))
 
 (defn start [data _]
-  (POST "/api/clients"
+  (POST (api-urls :status)
         {:format :edn
          :params {:count 10 :rate 1}
          :handler (partial start-success data)
@@ -93,7 +96,7 @@
                                 :status-chan nil})))
 
 (defn stop [data _]
-  (DELETE "/api/clients"
+  (DELETE (api-urls :status)
           {:handler (partial stop-success data)
            :error-handler error-handler}))
 
