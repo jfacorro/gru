@@ -4,7 +4,8 @@
             [om.core :as om]
             [om.dom :as dom]
             [ajax.core :refer [GET POST DELETE]]
-            [cljs.core.async :as async]))
+            [cljs.core.async :as async]
+            [clojure.string :as str]))
 
 (enable-console-print!)
 
@@ -38,9 +39,7 @@
 (defn status [data _]
   (om/component
    (dom/span nil
-             (case (:status data)
-               :stopped "Stopped"
-               :running "Running"))))
+             (-> data :status name str/capitalize))))
 
 ;; Number View
 
@@ -71,7 +70,6 @@
         (recur)))))
 
 (defn start-success [data resp]
-  (log resp)
   (let [out (async/chan)]
     (om/transact! data
                   #(merge % {:status :running
@@ -83,20 +81,19 @@
     (metrics-loop data out)))
 
 (defn start [data _]
-  (POST (api-urls :status)
+  (POST (api-urls :minions)
         {:format :edn
          :params {:count 10 :rate 1}
          :handler (partial start-success data)
          :error-handler error-handler}))
 
 (defn stop-success [data resp]
-  (log resp)
   (async/put! (@app-state :status-chan) :end)
   (om/transact! data #(merge % {:status :stopped
                                 :status-chan nil})))
 
 (defn stop [data _]
-  (DELETE (api-urls :status)
+  (DELETE (api-urls :minions)
           {:handler (partial stop-success data)
            :error-handler error-handler}))
 
@@ -114,7 +111,7 @@
   (om/component
    (case (:status data)
      :stopped (start-button data owner)
-     :running (stop-button data owner))))
+     (stop-button data owner))))
 
 ;; Metrics Table
 
