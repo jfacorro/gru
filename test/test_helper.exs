@@ -52,3 +52,13 @@ defmodule GruTest.MinionWeb do
     Map.put(data, :conn, Gru.HTTP.open("localhost", 8080))
   end
 end
+
+defmodule GruTest.MinionWebSlow do
+  use Gru.Minion, name: "Test Web Minion",
+  min_wait: 1000, max_wait: 5000, weight: 5,
+  tasks_module: GruTest.Minion.Tasks
+
+  def init(data) do
+    Map.put(data, :conn, Gru.HTTP.open("localhost", 8080))
+  end
+end
