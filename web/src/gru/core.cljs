@@ -61,23 +61,21 @@
   (om/transact! data
                 #(merge % response)))
 
-(defn get-status [data]
+(defn get-status [handler]
   (GET (api-urls :status)
-       {:handler (partial update-status data)
+       {:handler handler
         :response-format :edn}))
 
 (defn metrics-loop [data out]
   (go-loop []
     (let [[value ch] (async/alts! [out (async/timeout status-timeout)])]
       (when (not= value :end)
-        (get-status data)
+        (get-status (partial update-status data))
         (recur)))))
 
-(defn start-success [data resp]
+(defn start-success [data _]
   (let [out (async/chan)]
-    (om/transact! data
-                  #(merge % {:status :running
-                             :status-chan out}))
+    (om/transact! data #(merge % {:status-chan out}))
     (metrics-loop data out)))
 
 (defn start [data _]
@@ -171,3 +169,11 @@
 (om/root table-footer-view
          app-state
          {:target (dommy/sel1 :#metrics-total)})
+
+(defn init [data response]
+  (when-not (= :stopped (:status response))
+    (start-success data :ok)))
+
+(->> (om/root-cursor app-state)
+     (partial init)
+     get-status)
