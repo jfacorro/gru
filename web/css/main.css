@@ -50,10 +50,13 @@ table tr {
     color: #FFF;
 }
 
-table tfoot {
-    background-color: #23303E
+table thead, table tfoot {
+    background-color: #23303E;
 }
 
+.table-striped > tbody > tr:nth-of-type(even) {
+    background-color: #23303E;
+}
 .table-striped > tbody > tr:nth-of-type(odd) {
-    background-color: #23303E
+    background-color: transparent;
 }
