@@ -18,16 +18,9 @@
                           :metrics []
                           :total nil}))
 
-(def metrics-keys [:type
-                   :name
-                   :num_reqs
-                   :num_fails
-                   :median
-                   :average
-                   :min
-                   :max
-                   :content-size
-                   :reqs_sec])
+(def metrics-keys [:type, :name, :num_reqs, :num_fails,
+                   :median, :average, :min, :max,
+                   :content-size, :reqs_sec])
 
 (def status-timeout 1000)
 
@@ -55,9 +48,10 @@
 (defn error-handler [{:keys [status status-text]}]
   (js/alert (str "Oops! There was an ERROR: " status " " status-text)))
 
-(defn update-metrics [data response]
-  ;;(log (str response))
-  ;;(log (:count response))
+(defn update-status [data response]
+  (when (= :stopped (:status response))
+    (async/put! (@app-state :status-chan) :end))
+
   (om/transact! data
                 #(merge % response)))
 
@@ -65,9 +59,13 @@
   (go-loop []
     (let [[value ch] (async/alts! [out (async/timeout status-timeout)])]
       (when (not= value :end)
-        (GET (api-urls :status) {:handler (partial update-metrics data)
-                            :response-format :edn})
+        (get-status data)
         (recur)))))
+
+(defn get-status [data]
+  (GET (api-urls :status)
+       {:handler (partial update-status data)
+        :response-format :edn}))
 
 (defn start-success [data resp]
   (let [out (async/chan)]
@@ -124,10 +122,13 @@
      (apply dom/tr nil
             (om/build-all col-view values)))))
 
-(defn table-view [data owner]
+(defn table-body-view [data owner]
   (om/component
    (apply dom/tbody nil
           (om/build-all row-view (:metrics data)))))
+
+(defn table-footer-view [data owner]
+  (row-view (:total data) owner))
 
 (om/root status
          app-state
@@ -145,6 +146,10 @@
          app-state
          {:target (dommy/sel1 :#start-stop)})
 
-(om/root table-view
+(om/root table-body-view
          app-state
          {:target (dommy/sel1 :#metrics)})
+
+(om/root table-footer-view
+         app-state
+         {:target (dommy/sel1 :#metrics-total)})

@@ -42,7 +42,7 @@ end
 
 defmodule GruTest.MinionWeb do
   use Gru.Minion, name: "Test Web Minion",
-  min_wait: 0, max_wait: 1, weight: 5,
+  min_wait: 500, max_wait: 1000, weight: 5,
   tasks_module: GruTest.Minion.Tasks
 
   def init(data) do

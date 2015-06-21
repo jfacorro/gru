@@ -21,15 +21,32 @@ defmodule Gru.Web.Router do
   static "/img/*_"
 
   get "/api/status" do
-    status = %{metrics: metrics} = Gru.status
+    status = Gru.status
+    |> merge_metrics
+    |> discriminate_total
+
+    send_resp(conn, 200, Eden.encode!(status))
+  end
+
+  defp merge_metrics(%{metrics: metrics} = status) do
     metrics = for {key, metrics_local} <- metrics, into: [] do
       for {id, metric} <- metrics_local, into: key do
         {id, Metric.value(metric)}
       end
     end
-    status = %{status | metrics: metrics}
-    send_resp(conn, 200, Eden.encode!(status))
+    %{status | metrics: metrics}
   end
+
+  defp discriminate_total(%{metrics: metrics} = status) do
+    case Enum.partition(metrics, &total?/1) do
+      {[], _metrics} ->
+        status
+      {[total], metrics} ->
+        Map.merge(status, %{metrics: metrics, total: total})
+    end
+  end
+
+  defp total?(metric), do: metric[:name] == "Total"
 
   ## POST /api/minions
   ## The body of the request should be a map with two keys:
