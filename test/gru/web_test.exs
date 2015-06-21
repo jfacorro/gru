@@ -52,9 +52,11 @@ defmodule Gru.WebTest do
       {:ok, %{body: body}} =
         HTTP.get(conn, "/api/status", %{}, %{report: false})
       %{status: :starting,
-        metrics: metrics} = Eden.decode!(body)
+        metrics: metrics,
+        total: total} = Eden.decode!(body)
 
-      assert length(metrics) == 2
+      assert length(metrics) == 1
+      assert length(Map.keys(total)) != 0
     after
       {:ok, %{status_code: 204}} =
         HTTP.delete(conn, "/api/minions", "", %{}, %{report: false})

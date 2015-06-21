@@ -42,6 +42,9 @@ end
 
 defmodule GruTest.MinionWeb do
   use Gru.Minion, name: "Test Web Minion",
+  # Min & max wait times are set low to avoid
+  # having to wait too much time in the test for
+  # metrics to be generated.
   min_wait: 0, max_wait: 1, weight: 5,
   tasks_module: GruTest.Minion.Tasks
 
