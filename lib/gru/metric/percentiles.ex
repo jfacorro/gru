@@ -11,7 +11,7 @@ defmodule Gru.Metric.Percentiles do
 
     def value(metric) do
       @percentiles
-      |> Enum.map(fn p -> {p, HdrHistogram.percentile(metric.hist, p)} end)
+      |> Enum.map(fn p -> {p, HdrHistogram.percentile(metric.hist, p) / 1000} end)
       |> Enum.into(%{})
     end
 
