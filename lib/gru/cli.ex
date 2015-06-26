@@ -61,8 +61,10 @@ defmodule Gru.CLI do
     port = opts[:port] || @defaults.port
     root = opts[:root] || @defaults.root
 
-    info("Starting Gru web server at http://localhost:#{inspect port}")
+    info("Starting Gru web server at http://localhost:#{inspect port}...")
+    info("Minions registered for work: #{inspect minions}")
     Gru.Web.start(minions, port, root)
+    # Infinitely read form stdin
     IO.read(:all)
   end
 
