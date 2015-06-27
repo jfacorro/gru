@@ -1,11 +1,23 @@
-body {
+body, .modal-body, .modal-footer {
     background-color: #2C4A6A;
+    color: #FFF;
 }
 
 nav {
-    background-color: #23303E !important;
     border: none;
+}
+
+nav, .modal-header {
+    background-color: #23303E !important;
     color: #FFF;
+}
+
+.modal-header .close {
+    color: #FFF;
+}
+
+.modal-buttons {
+    text-align: right;
 }
 
 nav .logo {

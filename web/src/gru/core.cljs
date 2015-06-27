@@ -73,12 +73,14 @@
         (get-status (partial update-status data))
         (recur)))))
 
-(defn start-success [data _]
+(defn start-success
+  [data _]
   (let [out (async/chan)]
     (om/transact! data #(merge % {:status-chan out}))
     (metrics-loop data out)))
 
-(defn start [data _]
+(defn start
+  [data _]
   (POST (api-urls :minions)
         {:format :edn
          :params {:count (:count data)
@@ -86,12 +88,12 @@
          :handler (partial start-success data)
          :error-handler error-handler}))
 
-(defn stop-success [data resp]
-  (async/put! (@app-state :status-chan) :end)
-  (om/transact! data #(merge % {:status :stopped
-                                :status-chan nil})))
+(defn stop-success
+  [data _resp]
+  (get-status (partial update-status data)))
 
-(defn stop [data _]
+(defn stop
+  [data _]
   (DELETE (api-urls :minions)
           {:handler (partial stop-success data)
            :error-handler error-handler}))
