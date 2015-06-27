@@ -73,31 +73,35 @@
         (get-status (partial update-status data))
         (recur)))))
 
-(defn start-success [data _]
+(defn start-success
+  [data _]
   (let [out (async/chan)]
     (om/transact! data #(merge % {:status-chan out}))
     (metrics-loop data out)))
 
-(defn start [data _]
+(defn start
+  [data _]
   (POST (api-urls :minions)
         {:format :edn
-         :params {:count 10 :rate 1}
+         :params {:count (:count data)
+                  :rate  (:rate data)}
          :handler (partial start-success data)
          :error-handler error-handler}))
 
-(defn stop-success [data resp]
-  (async/put! (@app-state :status-chan) :end)
-  (om/transact! data #(merge % {:status :stopped
-                                :status-chan nil})))
+(defn stop-success
+  [data _resp]
+  (get-status (partial update-status data)))
 
-(defn stop [data _]
+(defn stop
+  [data _]
   (DELETE (api-urls :minions)
           {:handler (partial stop-success data)
            :error-handler error-handler}))
 
 (defn start-button [data owner]
   (dom/button #js {:className "btn btn-success"
-                   :onClick (partial start data)}
+                   :data-toggle "modal"
+                   :data-target ".start-options"}
               "Start"))
 
 (defn stop-button [data owner]
@@ -174,6 +178,27 @@
   (when-not (= :stopped (:status response))
     (start-success data :ok)))
 
-(->> (om/root-cursor app-state)
-     (partial init)
-     get-status)
+(defn int-from-input [id]
+  (-> id sel1 (.-value) js/parseInt))
+
+(defn start-options []
+  (let [count (int-from-input :#minion-count-txt)
+        rate  (int-from-input :#minion-rate-txt)]
+    {:count count
+     :rate rate}))
+
+(defn start-handler [e]
+  (let [opts   (start-options)
+        _      (swap! app-state merge opts)
+        cursor (om/root-cursor app-state)]
+    (start cursor e)))
+
+(defn main []
+  (->> (om/root-cursor app-state)
+       (partial init)
+       get-status)
+
+  (dommy/listen! (dommy/sel1 :#go-btn)
+                 :click start-handler))
+
+(main)

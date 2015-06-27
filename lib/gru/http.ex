@@ -62,7 +62,7 @@ defmodule Gru.HTTP do
         {:ok, %{status_code: status_code}} ->
           report_error(key, status_code)
         {:error, reason} ->
-          report_error(:error, reason)
+          report_error(key, reason)
       end
     end
 

@@ -47,6 +47,32 @@
         <tfoot id="metrics-total"></tfoot>
       </table>
     </div>
+
+    <div class="modal fade start-options" tabindex="-1" role="dialog" aria-labelledby="start-options-lbl">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title" id="start-options-lbl">Start Minions</h4>
+          </div>
+          <div class="modal-body">
+             <div class="form-group">
+               <label for="minion-count-txt">Count</label>
+               <input type="text" class="form-control" id="minion-count-txt"/>
+             </div>
+             <div class="form-group">
+               <label for="minion-rate-txt">Rate</label>
+               <input type="text" class="form-control" id="minion-rate-txt"/>
+             </div>
+             <div class="modal-buttons">
+               <button type="button" class="btn btn-success" id="go-btn" data-dismiss="modal">Go!</button>
+             </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/gru.js" type="text/javascript"></script>
