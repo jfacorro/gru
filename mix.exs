@@ -18,7 +18,7 @@ defmodule Gru.Mixfile do
   defp deps do
     [{:cowboy, github: "ninenines/cowboy", tag: "1.0.1", override: true},
      {:plug, "~> 0.12.2"},
-     {:shotgun, github: "inaka/shotgun", tag: "master"},
+     {:shotgun, github: "inaka/shotgun", tag: "0.1.12"},
      {:eden, "~> 0.1.3"},
      # Override these two deps because they conflict between cowboy and gun.
      {:cowlib, "~> 1.0.0", override: true},
