@@ -6,7 +6,8 @@ defmodule Gru.Mixfile do
      version: "0.0.1",
      elixir: "~> 1.0",
      deps: deps,
-     escript: escript]
+     escript: escript,
+     test_coverage: [tool: ExCoveralls]]
   end
 
   def application do
@@ -26,7 +27,8 @@ defmodule Gru.Mixfile do
 
      {:exreloader, github: "jfacorro/exreloader", tag: "master", only: :dev},
      {:eep, github: "virtan/eep", tag: "v1.1", only: :dev},
-     {:katana, github: "inaka/erlang-katana", tag: "0.2.5", only: :dev}
+     {:katana, github: "inaka/erlang-katana", tag: "0.2.5", only: :dev},
+     {:excoveralls, "~> 0.3", only: [:dev, :test]}
     ]
   end
 
