@@ -41,7 +41,7 @@ defmodule Gru.WebTest do
   test "DELETE /api/status" do
     conn = HTTP.open("localhost", 8080)
 
-    {:ok, %{status_code: 204}} = HTTP.delete(conn, "/api/status", "",
+    {:ok, %{status_code: 200}} = HTTP.delete(conn, "/api/status", "",
                                              %{}, %{report: false})
 
     HTTP.close(conn)
