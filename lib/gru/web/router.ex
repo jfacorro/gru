@@ -19,6 +19,7 @@ defmodule Gru.Web.Router do
   static "/js/*_"
   static "/css/*_"
   static "/img/*_"
+  static "/fonts/*_"
 
   get "/api/status" do
     status = Gru.status
@@ -50,7 +51,7 @@ defmodule Gru.Web.Router do
 
   delete "/api/status" do
     Gru.clear
-    send_resp(conn, 204, "")
+    send_resp(conn, 200, Eden.encode!(Gru.status))
   end
 
   ## POST /api/minions

@@ -46,6 +46,12 @@ nav .logo {
     margin-right: 5px;
 }
 
+#clear button {
+    padding: 3px 5px;
+    margin-top: 5px;
+    font-size: 0.9em;
+}
+
 #start-stop {
     display: inline-block;
     vertical-align: middle;
