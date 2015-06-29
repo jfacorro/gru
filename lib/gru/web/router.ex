@@ -48,6 +48,11 @@ defmodule Gru.Web.Router do
 
   defp total?(metric), do: metric[:name] == "Total"
 
+  delete "/api/status" do
+    Gru.clear
+    send_resp(conn, 204, "")
+  end
+
   ## POST /api/minions
   ## The body of the request should be a map with two keys:
   ##  - :count - the total amount of minions to start.
