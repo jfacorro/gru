@@ -5,6 +5,7 @@ body, .modal-body, .modal-footer {
 
 nav {
     border: none;
+    height: 80px;
 }
 
 nav, .modal-header {
@@ -23,34 +24,46 @@ nav, .modal-header {
 nav .logo {
     float: left;
     width: 45px;
-    margin: 2.5px 0px;
+    margin: 15px 0px;
 }
 
 #controls {
     float: right;
-    height: 50px;
-}
-
-#controls button {
-    margin: 8px 0px;
 }
 
 #controls .info {
     display: inline-block;
     width: 100px;
     text-align: center;
+    vertical-align: middle;
+}
+#controls .info label {
+    font-size: 1.2em;
+    margin: 0px;
 }
 
 #status {
     margin-right: 5px;
 }
 
+#clear button {
+    padding: 3px 5px;
+    margin-top: 5px;
+    font-size: 0.9em;
+}
+
 #start-stop {
     display: inline-block;
+    vertical-align: middle;
+}
+
+#start-stop button {
+    margin: 15px 0px;
+    height: 50px;
 }
 
 .main {
-    margin-top: 60px;
+    margin-top: 100px;
 }
 
 table {

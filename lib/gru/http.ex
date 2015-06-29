@@ -26,27 +26,27 @@ defmodule Gru.HTTP do
     request(conn, :get, path, "", headers, opts)
   end
 
-  def post(conn, path, body, headers \\ %{}, opts \\ @opts) do
+  def post(conn, path, body \\ "", headers \\ %{}, opts \\ @opts) do
     request(conn, :post, path, body, headers, opts)
   end
 
-  def delete(conn, path, body, headers \\ %{}, opts \\ @opts) do
+  def delete(conn, path, body \\ "", headers \\ %{}, opts \\ @opts) do
     request(conn, :delete, path, body, headers, opts)
   end
 
-  def put(conn, path, body, headers \\ %{}, opts \\ @opts) do
+  def put(conn, path, body \\ "", headers \\ %{}, opts \\ @opts) do
     request(conn, :put, path, body, headers, opts)
   end
 
-  def options(conn, path, body, headers \\ %{}, opts \\ @opts) do
+  def options(conn, path, body \\ "", headers \\ %{}, opts \\ @opts) do
     request(conn, :options, path, body, headers, opts)
   end
 
-  def head(conn, path, body, headers \\ %{}, opts \\ @opts) do
+  def head(conn, path, body \\ "", headers \\ %{}, opts \\ @opts) do
     request(conn, :head, path, body, headers, opts)
   end
 
-  def request(conn, method, path, body, headers \\ %{}, opts \\ @opts) do
+  def request(conn, method, path, body \\ "", headers \\ %{}, opts \\ @opts) do
     path_str = String.to_char_list(path)
     opts = Map.put(opts, :timeout, @timeout)
     {time, value} = Utils.time(:shotgun.request(conn, method, path_str,

@@ -31,7 +31,7 @@
 
 ;; Status
 
-(defn status [data _]
+(defn status-view [data _]
   (om/component
    (dom/span nil
              (-> data :status name str/capitalize))))
@@ -48,6 +48,27 @@
     (dom/label nil (or (as-> (get-in data keys) val
                          (and val (format-fn val)))
                        "n/a")))))
+
+;; Clear
+
+(defn clear
+  [data event]
+  (DELETE (api-urls :status)
+          {:handler (partial update-status data)
+           :response-format :edn}))
+
+(defn clear-button
+  [data _]
+  (dom/button #js {:className "btn btn-warning"
+                   :onClick (partial clear data)}
+              "Clear"))
+
+(defn clear-view
+  [data owner]
+  (om/component
+   (case (:status data)
+     :stopped (dom/span nil nil)
+     (clear-button data owner))))
 
 ;; Start & Stop
 
@@ -109,7 +130,7 @@
                    :onClick (partial stop data)}
               "Stop"))
 
-(defn start-stop [data owner]
+(defn start-stop-view [data owner]
   (om/component
    (case (:status data)
      :stopped (start-button data owner)
@@ -150,7 +171,7 @@
 (defn table-footer-view [data owner]
   (row-view (:total data) owner))
 
-(om/root status
+(om/root status-view
          app-state
          {:target (dommy/sel1 :#status)})
 
@@ -162,7 +183,11 @@
          app-state
          {:target (dommy/sel1 :#reqs-sec)})
 
-(om/root start-stop
+(om/root clear-view
+         app-state
+         {:target (dommy/sel1 :#clear)})
+
+(om/root start-stop-view
          app-state
          {:target (dommy/sel1 :#start-stop)})
 
