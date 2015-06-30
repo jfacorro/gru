@@ -51,7 +51,10 @@ defmodule Gru.Web.Router do
 
   delete "/api/status" do
     Gru.clear
-    send_resp(conn, 200, Eden.encode!(Gru.status))
+    status = Gru.status
+             |> merge_metrics
+             |> discriminate_total
+    send_resp(conn, 200, Eden.encode!(status))
   end
 
   ## POST /api/minions
