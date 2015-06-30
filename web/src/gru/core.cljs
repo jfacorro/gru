@@ -49,27 +49,6 @@
                          (and val (format-fn val)))
                        "n/a")))))
 
-;; Clear
-
-(defn clear
-  [data event]
-  (DELETE (api-urls :status)
-          {:handler (partial update-status data)
-           :response-format :edn}))
-
-(defn clear-button
-  [data _]
-  (dom/button #js {:className "btn btn-warning"
-                   :onClick (partial clear data)}
-              "Clear"))
-
-(defn clear-view
-  [data owner]
-  (om/component
-   (case (:status data)
-     :stopped (dom/span nil nil)
-     (clear-button data owner))))
-
 ;; Start & Stop
 
 (defn error-handler [{:keys [status status-text]}]
@@ -135,6 +114,27 @@
    (case (:status data)
      :stopped (start-button data owner)
      (stop-button data owner))))
+
+;; Clear
+
+(defn clear
+  [data event]
+  (DELETE (api-urls :status)
+          {:handler (partial update-status data)
+           :response-format :edn}))
+
+(defn clear-button
+  [data _]
+  (dom/button #js {:className "btn btn-warning"
+                   :onClick (partial clear data)}
+              "Clear"))
+
+(defn clear-view
+  [data owner]
+  (om/component
+   (case (:status data)
+     :stopped (dom/span nil nil)
+     (clear-button data owner))))
 
 ;; Metrics Table
 
