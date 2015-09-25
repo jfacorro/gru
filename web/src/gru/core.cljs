@@ -1,5 +1,6 @@
 (ns gru.core
-  (:require-macros [cljs.core.async.macros :refer [go go-loop]])
+  (:require-macros [cljs.core.async.macros :refer [go go-loop]]
+                   [om.core :refer [component]])
   (:require [dommy.core :as dommy :refer-macros [sel sel1]]
             [om.core :as om]
             [om.dom :as dom]
@@ -32,7 +33,7 @@
 ;; Status
 
 (defn status-view [data _]
-  (om/component
+  (component
    (dom/span nil
              (-> data :status name str/capitalize))))
 
@@ -44,7 +45,7 @@
   ([keys data owner]
    (label-view keys identity data owner))
   ([keys format-fn data owner]
-   (om/component
+   (component
     (dom/label nil (or (as-> (get-in data keys) val
                          (and val (format-fn val)))
                        "n/a")))))
@@ -110,7 +111,7 @@
               "Stop"))
 
 (defn start-stop-view [data owner]
-  (om/component
+  (component
    (case (:status data)
      :stopped (start-button data owner)
      (stop-button data owner))))
@@ -131,7 +132,7 @@
 
 (defn clear-view
   [data owner]
-  (om/component
+  (component
    (case (:status data)
      :stopped (dom/span nil nil)
      (clear-button data owner))))
@@ -151,11 +152,11 @@
 (defmethod format :default [_ v] v)
 
 (defn col-view [data owner]
-  (om/component
+  (component
    (dom/td nil data)))
 
 (defn row-view [data owner]
-  (om/component
+  (component
    (let [values (mapv #(as-> (get data %) v
                          (or (and v (format % v))
                              "n/a"))
@@ -164,7 +165,7 @@
             (om/build-all col-view values)))))
 
 (defn table-body-view [data owner]
-  (om/component
+  (component
    (apply dom/tbody nil
           (om/build-all row-view (:metrics data)))))
 
