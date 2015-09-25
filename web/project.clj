@@ -3,16 +3,16 @@
   :url "http://example.com/FIXME"
 
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [org.clojure/clojurescript "0.0-2755"]
+                 [org.clojure/clojurescript "0.0-2760"]
 
-                 [org.omcljs/om "0.8.8"]
+                 [org.omcljs/om "0.9.0"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [cljs-ajax "0.3.12"]
                  [prismatic/dommy "1.1.0"]]
 
   :node-dependencies [[source-map-support "0.2.8"]]
 
-  :plugins [[lein-cljsbuild "1.0.4"]
+  :plugins [[lein-cljsbuild "1.1.0"]
             [lein-npm "0.4.0"]]
 
   :source-paths ["src" "target/classes"]

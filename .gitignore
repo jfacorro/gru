@@ -8,3 +8,4 @@ mix.lock
 callgrind.out.*
 log/
 bin/
+web/js-adv/
