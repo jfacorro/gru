@@ -2,30 +2,28 @@ defmodule Gru.Metric.Server do
   use GenServer
   alias Gru.Metric
 
-  @datastore __MODULE__
+  @table :metric
 
   ## API
 
   @spec report(any, Metric.t, any) :: :ok
-  def report(key, metric, value) do
-    metrics = lookup(@datastore, key) || %{}
-    id = Metric.id(metric)
-    metrics = update_in(metrics, [id],
-                        &Metric.accumulate(&1 || metric, value))
-    insert(@datastore, key, metrics)
-    :ok
-  end
-
-  def get(key) do
-    lookup(@datastore, key)
+  def report(name, metric, value) do
+    fun = fn() ->
+      id = Metric.id(metric)
+      key = {name, id}
+      metric = (lookup(@table, key, :write) || metric)
+               |> Metric.accumulate(value)
+      insert(@table, key, metric)
+    end
+    transaction(fun)
   end
 
   def get_all do
-    get_all(@datastore)
+    get_all(@table)
   end
 
   def clear do
-    delete_all(@datastore)
+    delete_all(@table)
   end
 
   ## GenServer
@@ -35,46 +33,56 @@ defmodule Gru.Metric.Server do
   end
 
   def init([]) do
-    create_table(@datastore)
+    create_table(@table)
     {:ok, {}}
   end
 
   ## Internal
 
-  defp create_table(name) do
-    opts = [:set,
-            :named_table,
-            :public,
-            read_concurrency: true,
-            write_concurrency: true,
-            keypos: 1]
-    :ets.new(name, opts)
+  defp create_table(table) do
+    Application.start(:mnesia)
+    table_config = [ram_copies: [node()],
+                    type: :set,
+                    attributes: [:key, :metric],
+                    storage_properties: [ets: [write_concurrency: true]]]
+    :mnesia.create_table(table, table_config)
+
+    :mnesia.wait_for_tables([table], 5000)
   end
 
-  defp insert(ds, key, item) do
-    :ets.insert(ds, {key, item})
+  defp insert(table, key, item) do
+    :mnesia.write({table, key, item})
   end
 
-  defp lookup(ds, key) do
-    case exists?(ds, key) do
-      true ->
-        :ets.lookup_element(ds, key, 2)
-      false ->
-        nil
+  defp transaction(fun) do
+    {:atomic, result} = :mnesia.transaction(fun)
+    result
+  end
+
+  defp lookup(table, key, lock_kind) do
+    case :mnesia.read(table, key, lock_kind) do
+      [] -> nil
+      [{^table, _, metrics}] -> metrics
     end
   end
 
-  defp get_all(ds) do
-    :ets.tab2list(ds)
-    |> :maps.from_list
+  defp get_all(table) do
+    table
+    |> :mnesia.dirty_all_keys
+    |> Enum.map(&:mnesia.dirty_read({table, &1}))
+    |> Enum.reduce(%{},
+      fn([{_, {name, id}, metric}], result) ->
+        result = update_in(result, [name], &(&1 || %{}))
+        put_in(result, [name, id], metric)
+      end)
   end
 
-  defp delete_all(ds) do
-    :ets.delete_all_objects(ds)
-  end
-
-  defp exists?(ds, key) do
-    :ets.member(ds, key)
+  defp delete_all(table) do
+    fun = fn() ->
+      keys = :mnesia.all_keys(table)
+      Enum.each keys, &:mnesia.delete({table, &1})
+    end
+    transaction(fun)
   end
 
 end
