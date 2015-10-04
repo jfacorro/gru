@@ -3,7 +3,10 @@ Gru
 
 [![Travis](https://img.shields.io/travis/jfacorro/gru.svg?style=flat-square)](https://travis-ci.org/jfacorro/gru)
 
+<img src="https://github.com/jfacorro/gru/blob/20eea9a39f646cdea57aedee2b4e5cfb1595da74/web/img/logo.png" align="right" style="float:right" />
+
 Gru is an attempt to build a lightweight but scalable load/stress testing tool. Using Elixir for this purpose has many benefits, the main one being the Erlang VM, which has built-in support for lightweight processes.
+
 
 # Rationale
 
