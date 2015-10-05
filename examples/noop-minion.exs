@@ -3,7 +3,7 @@ defmodule Examples.Status.Tasks do
 
   @weight 100
   deftask get_status(data) do
-    Gru.HTTP.get(data.conn, "/api/status")
+    Gru.HTTP.get(data.conn, "/api/noop")
     data
   end
 end

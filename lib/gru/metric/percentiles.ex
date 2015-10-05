@@ -4,7 +4,7 @@ defmodule Gru.Metric.Percentiles do
   defstruct id: :percentiles, description: "",
             hist: HdrHistogram.new(1, 3600000000, 1)
 
-  defimpl Gru.Metric, for: Percentiles do
+  defimpl Gru.Metric.Protocol, for: Percentiles do
     @percentiles [50, 66, 75, 80, 90, 95, 98, 99, 100]
 
     def id(metric), do: metric.id

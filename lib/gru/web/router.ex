@@ -1,7 +1,7 @@
 defmodule Gru.Web.Router do
   use Plug.Router
   import Gru.Web.Utils
-  alias Gru.Metric
+  alias Gru.Metric.Protocol, as: Metric
   plug :match
   plug :dispatch
 
@@ -20,6 +20,10 @@ defmodule Gru.Web.Router do
   static "/css/*_"
   static "/img/*_"
   static "/fonts/*_"
+
+  get "/api/noop" do
+    send_resp(conn, 204, "")
+  end
 
   get "/api/status" do
     status = Gru.status

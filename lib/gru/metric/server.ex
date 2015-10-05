@@ -1,30 +1,15 @@
 defmodule Gru.Metric.Server do
   use GenServer
-  alias Gru.Metric
+  alias Gru.Utils
+  alias Gru.Metric.Protocol, as: Proto
 
-  @table :metric
-
-  ## API
-
-  @spec report(any, Metric.t, any) :: :ok
-  def report(name, metric, value) do
-    fun = fn() ->
-      id = Metric.id(metric)
-      key = {name, id}
-      metric = (lookup(@table, key, :write) || metric)
-               |> Metric.accumulate(value)
-      insert(@table, key, metric)
-    end
-    transaction(fun)
-  end
-
-  def get_all do
-    get_all(@table)
-  end
-
-  def clear do
-    delete_all(@table)
-  end
+  @index Gru.Metric.Index
+  @metrics [Gru.Metric.Average,
+            Gru.Metric.Count,
+            Gru.Metric.CountInterval,
+            Gru.Metric.Min,
+            Gru.Metric.Max,
+            Gru.Metric.Percentiles]
 
   ## GenServer
 
@@ -33,56 +18,93 @@ defmodule Gru.Metric.Server do
   end
 
   def init([]) do
-    create_table(@table)
-    {:ok, {}}
+    create_table(@index)
+    Enum.map(@metrics, &create_metric_table/1)
+    {:ok, %{}}
+  end
+
+  def handle_call(:all, _from, state) do
+    all = :ets.tab2list(@index)
+    |> Enum.map(&get_metric/1)
+    |> Enum.reduce(%{}, &build_all/2)
+
+    {:reply, all, state}
+  end
+
+  def handle_call(:clear, _from, state) do
+    Enum.map(@metrics, &:ets.delete_all_objects/1)
+
+    {:reply, :ok, state}
+  end
+
+
+  ## API
+
+  @spec notify(any, Metric.t, any) :: :ok
+  def notify(group, metric, value) do
+    key = {group, metric}
+    case lookup(@index, key) do
+      nil ->
+        {:ok, pid} = Supervisor.start_child(Gru.Metric.Supervisor, [metric, value])
+        :ets.insert(@index, {key, pid})
+      pid ->
+        Gru.Metric.Worker.update(pid, value)
+    end
+  end
+
+  def get_all do
+    GenServer.call(__MODULE__, :all)
+  end
+
+  def clear do
+    GenServer.call(__MODULE__, :clear)
   end
 
   ## Internal
 
-  defp create_table(table) do
-    Application.start(:mnesia)
-    table_config = [ram_copies: [node()],
-                    type: :set,
-                    attributes: [:key, :metric],
-                    storage_properties: [ets: [write_concurrency: true]]]
-    :mnesia.create_table(table, table_config)
-
-    :mnesia.wait_for_tables([table], 5000)
-  end
-
-  defp insert(table, key, item) do
-    :mnesia.write({table, key, item})
-  end
-
-  defp transaction(fun) do
-    {:atomic, result} = :mnesia.transaction(fun)
+  defp build_all(nil, result) do
     result
   end
+  defp build_all({group, metric}, result) do
+    result = update_in(result, [group], &(&1 || %{}))
+    id = Proto.id(metric)
+    put_in(result, [group, id], metric)
+  end
 
-  defp lookup(table, key, lock_kind) do
-    case :mnesia.read(table, key, lock_kind) do
-      [] -> nil
-      [{^table, _, metrics}] -> metrics
+  defp get_metric({{group, metric}, pid}) do
+    try do
+      table = Utils.struct_type(metric)
+      metric = :ets.lookup_element(table, pid, 2)
+      {group, metric}
+    catch
+      _, :badarg -> nil
     end
   end
 
-  defp get_all(table) do
-    table
-    |> :mnesia.dirty_all_keys
-    |> Enum.map(&:mnesia.dirty_read({table, &1}))
-    |> Enum.reduce(%{},
-      fn([{_, {name, id}, metric}], result) ->
-        result = update_in(result, [name], &(&1 || %{}))
-        put_in(result, [name, id], metric)
-      end)
+  defp create_table(name) do
+    opts = [:set,
+            :named_table,
+            :public,
+            read_concurrency: false,
+            write_concurrency: true,
+            keypos: 1]
+    :ets.new(name, opts)
   end
 
-  defp delete_all(table) do
-    fun = fn() ->
-      keys = :mnesia.all_keys(table)
-      Enum.each keys, &:mnesia.delete({table, &1})
+  defp create_metric_table(name) do
+    opts = [:set,
+            :named_table,
+            :public,
+            read_concurrency: true,
+            write_concurrency: false,
+            keypos: 1]
+    :ets.new(name, opts)
+  end
+
+  defp lookup(table, key) do
+    case :ets.member(table, key) do
+      true  -> :ets.lookup_element(table, key, 2)
+      false -> nil
     end
-    transaction(fun)
   end
-
 end

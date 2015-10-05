@@ -5,7 +5,8 @@ defmodule Gru.App do
     import Supervisor.Spec
     children = [worker(Gru.Minion.Server, []),
                 supervisor(Gru.Minion.Supervisor, []),
-                worker(Gru.Metric.Server, [])]
+                worker(Gru.Metric.Server, []),
+                supervisor(Gru.Metric.Supervisor, [])]
     opts = [strategy: :one_for_one,
             name: Gru.Supervisor]
 

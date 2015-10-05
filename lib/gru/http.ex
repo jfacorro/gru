@@ -2,7 +2,7 @@ defmodule Gru.HTTP do
   require Logger
   require Gru.Utils
   alias Gru.Utils
-  alias Gru.Metric.Server, as: Metric
+  alias Gru.Metric
   alias Gru.Metric.Count
   alias Gru.Metric.CountInterval
   alias Gru.Metric.Average
@@ -72,24 +72,28 @@ defmodule Gru.HTTP do
   ## Internal
 
   defp report_general(time_us) do
-    key = %{name: "Total"}
-    Metric.report(key, %Count{id: :num_reqs, description: "# Requests"}, 1)
-    Metric.report(key, %CountInterval{id: :reqs_sec, description: "# Reqs/sec", interval: 1000}, 1)
-    Metric.report(key, %Percentiles{description: "Percentiles"}, time_us)
+    group = %{name: "Total"}
+    Metric.notify(group, %Count{id: :num_reqs, description: "# Requests"}, 1)
+    Metric.notify(group,
+                  %CountInterval{id: :reqs_sec,
+                                 description: "# Reqs/sec",
+                                 interval: 1000},
+                  1)
+    Metric.notify(group, %Percentiles{description: "Percentiles"}, time_us)
   end
 
-  defp report_success(key, time_us) do
+  defp report_success(group, time_us) do
     time_ms = time_us / 1000
-    Metric.report(key, %Count{id: :num_reqs, description: "# Requests"}, 1)
-    Metric.report(key, %Average{id: :average, description: "Average"}, time_ms)
-    Metric.report(key, %Min{id: :min, description: "Min"}, time_ms)
-    Metric.report(key, %Max{id: :max, description: "Max"}, time_ms)
-    Metric.report(key, %CountInterval{id: :reqs_sec, description: "# Reqs/sec", interval: 1000}, 1)
+    Metric.notify(group, %Count{id: :num_reqs, description: "# Requests"}, 1)
+    Metric.notify(group, %Average{id: :average, description: "Average"}, time_ms)
+    Metric.notify(group, %Min{id: :min, description: "Min"}, time_ms)
+    Metric.notify(group, %Max{id: :max, description: "Max"}, time_ms)
+    Metric.notify(group, %CountInterval{id: :reqs_sec, description: "# Reqs/sec", interval: 1000}, 1)
 
-    Metric.report(key, %Percentiles{description: "Percentiles"}, time_us)
+    Metric.notify(group, %Percentiles{description: "Percentiles"}, time_us)
   end
 
-  defp report_error(key, status_code) do
-    Metric.report(key, %Count{id: :num_fails, description: status_code}, 1)
+  defp report_error(group, status_code) do
+    Metric.notify(group, %Count{id: :num_fails, description: status_code}, 1)
   end
 end

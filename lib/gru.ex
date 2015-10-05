@@ -24,12 +24,12 @@ defmodule Gru do
   end
 
   def clear do
-    Gru.Metric.Server.clear
+    Gru.Metric.clear
   end
 
   def status do
     %{status: Gru.Minion.Server.status,
       count: Gru.Minion.Supervisor.count,
-      metrics: Gru.Metric.Server.get_all}
+      metrics: Gru.Metric.get_all}
   end
 end

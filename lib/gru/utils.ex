@@ -1,4 +1,17 @@
 defmodule Gru.Utils do
+
+  @doc """
+  If the argument is a map it returns the value for its
+  `:__struct__` key, otherwise it returns nil.
+  """
+  @spec struct_type(any) :: any
+  def struct_type(x) when :erlang.is_map(x) do
+    Map.get(x, :__struct__, nil)
+  end
+  def struct_type(_x) do
+    throw(:badarg)
+  end
+
   @type element :: any
 
   @doc """
