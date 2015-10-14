@@ -8,7 +8,7 @@ defmodule Examples.Status.Tasks do
   end
 end
 
-defmodule Examples.Minion.Status do
+defmodule Examples.Status.Minion do
   use Gru.Minion, name: "Examples Status Minion",
   min_wait: 1000, max_wait: 5000, weight: 5,
   tasks_module: Examples.Status.Tasks

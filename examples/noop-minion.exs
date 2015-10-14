@@ -1,19 +1,20 @@
-defmodule Examples.Status.Tasks do
+defmodule Examples.Noop.Tasks do
   use Gru.Minion.Tasks
 
   @weight 100
   deftask get_status(data) do
-    Gru.HTTP.get(data.conn, "/api/noop")
+    Gru.HTTP.get(data.conn, "/")
     data
   end
 end
 
-defmodule Examples.Minion.Status do
-  use Gru.Minion, name: "Examples Status Minion",
+defmodule Examples.Noop.Minion do
+  use Gru.Minion, name: "Examples Noop Minion",
   min_wait: 1000, max_wait: 5000, weight: 5,
-  tasks_module: Examples.Status.Tasks
+  tasks_module: Examples.Noop.Tasks
 
   def init(data) do
-    Map.put(data, :conn, Gru.HTTP.open("localhost", 8888))
+    conn = Gru.HTTP.open("localhost", 8181)
+    Map.put(data, :conn, conn)
   end
 end
