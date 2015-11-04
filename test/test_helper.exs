@@ -27,8 +27,8 @@ defmodule GruTest.Minion.Tasks do
       Gru.HTTP.get(data.conn, "/api/status")
     else
       key = %{name: "Test", type: "GET"}
-      Server.report(key, %Count{id: :num_reqs}, 1)
-      Server.report(key, %CountInterval{id: :reqs_sec}, 1)
+      Server.notify(key, %Count{id: :num_reqs}, 1)
+      Server.notify(key, %CountInterval{id: :reqs_sec}, 1)
     end
     data
   end
