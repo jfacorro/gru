@@ -2,6 +2,7 @@ defmodule Gru.Minion.Server do
   alias Gru.Utils
   alias Gru.Utils.GenFSM
   use GenFSM, initial_state: :stopped
+  require Logger
 
   def start(minions, n, rate) when is_list(minions) do
     event = {:start, minions, n, rate}
@@ -75,18 +76,26 @@ defmodule Gru.Minion.Server do
   def handle_info(_, state, data) do
     {:next_state, state, data}
   end
+
   ## Internal
 
   defp start_minions(state) do
     n = min(state.rate, state.n)
-    state.minions
+
+    Logger.info "Starting #{inspect n}..."
+
+    started = state.minions
     |> minions_list(n)
     |> Enum.map(&Gru.Minion.Supervisor.start_child/1)
+    |> Enum.filter(fn {:ok, _} -> true; _ -> false end)
+    |> length
+
+    Logger.info "Started #{inspect started} of #{inspect n}, #{inspect state.n} left"
   end
 
   defp stop_minions do
     Gru.Minion.Supervisor.children
-    |> Enum.map(&Gru.Minion.Supervisor.stop_child/1)
+    |> Enum.each(&Gru.Minion.Supervisor.stop_child/1)
 
     :all_stopped
   end

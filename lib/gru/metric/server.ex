@@ -11,6 +11,28 @@ defmodule Gru.Metric.Server do
             Gru.Metric.Max,
             Gru.Metric.Percentiles]
 
+  ## API
+
+  @spec notify(any, Metric.t, any) :: :ok
+  def notify(group, metric, value) do
+    key = {group, metric}
+    case lookup(@index, key) do
+      nil ->
+        {:ok, pid} = Supervisor.start_child(Gru.Metric.Supervisor, [metric, value])
+        :ets.insert(@index, {key, pid})
+      pid ->
+        Gru.Metric.Worker.update(pid, value)
+    end
+  end
+
+  def get_all do
+    GenServer.call(__MODULE__, :all)
+  end
+
+  def clear do
+    GenServer.call(__MODULE__, :clear)
+  end
+
   ## GenServer
 
   def start_link do
@@ -35,29 +57,6 @@ defmodule Gru.Metric.Server do
     Enum.map(@metrics, &:ets.delete_all_objects/1)
 
     {:reply, :ok, state}
-  end
-
-
-  ## API
-
-  @spec notify(any, Metric.t, any) :: :ok
-  def notify(group, metric, value) do
-    key = {group, metric}
-    case lookup(@index, key) do
-      nil ->
-        {:ok, pid} = Supervisor.start_child(Gru.Metric.Supervisor, [metric, value])
-        :ets.insert(@index, {key, pid})
-      pid ->
-        Gru.Metric.Worker.update(pid, value)
-    end
-  end
-
-  def get_all do
-    GenServer.call(__MODULE__, :all)
-  end
-
-  def clear do
-    GenServer.call(__MODULE__, :clear)
   end
 
   ## Internal
